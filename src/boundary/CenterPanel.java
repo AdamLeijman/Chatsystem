@@ -39,10 +39,6 @@ public class CenterPanel <T> extends JPanel implements ActionListener {
     }
 
     public void addToDialog(T[] obj){
-<<<<<<< Updated upstream
-        //dialog.setCellRenderer(cr);
-=======
->>>>>>> Stashed changes
         dialog.setListData(obj);
     }
 
