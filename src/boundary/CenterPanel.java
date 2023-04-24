@@ -39,7 +39,7 @@ public class CenterPanel <T> extends JPanel implements ActionListener {
 
     public void addToDialog(T[] obj){
 
-        jlistDialog.setListData(obj);
+        //jlistDialog.setListData(obj);
         String[] str = {"test", "test2"};
         jlistDialog.setListData((T[]) str);
 
@@ -48,11 +48,13 @@ public class CenterPanel <T> extends JPanel implements ActionListener {
 
         ArrayList<Icon> cars = new ArrayList<Icon>(); // Create an ArrayList object
 
-        //Icon icon = new Icon();
+        //Icon icon = new ImageIcon("images/gubbe.jpg");
         //Icon ic
+        //cars.add(new ImageIcon("images/gubbe.jpg"));
 
+        icon[0] = (T) new ImageIcon("images/gubbe.jpg");
 
-        //jlistDialog.setListData();
+        jlistDialog.setListData(icon);
     }
 
    /* public void paint(Graphics g) {
