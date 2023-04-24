@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class CenterPanel <T> extends JPanel implements ActionListener {
 
@@ -41,6 +42,17 @@ public class CenterPanel <T> extends JPanel implements ActionListener {
         jlistDialog.setListData(obj);
         String[] str = {"test", "test2"};
         jlistDialog.setListData((T[]) str);
+
+        T[] icon = obj;
+        //ScaledImage(icon.getImage(), lblPhotoField.getWidth(), lblPhotoField.getHeight());
+
+        ArrayList<Icon> cars = new ArrayList<Icon>(); // Create an ArrayList object
+
+        //Icon icon = new Icon();
+        //Icon ic
+
+
+        //jlistDialog.setListData();
     }
 
    /* public void paint(Graphics g) {
