@@ -37,7 +37,10 @@ public class CenterPanel <T> extends JPanel implements ActionListener {
     }
 
     public void addToDialog(T[] obj){
+
         jlistDialog.setListData(obj);
+        String[] str = {"test", "test2"};
+        jlistDialog.setListData((T[]) str);
     }
 
    /* public void paint(Graphics g) {

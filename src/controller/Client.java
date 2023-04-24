@@ -201,8 +201,4 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
         }
     }
 
-    public static void main(String[] args) {
-        Client client = new Client();
-    }
-
 }
