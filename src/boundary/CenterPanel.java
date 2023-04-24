@@ -3,17 +3,15 @@ package boundary;
 import controller.Controller;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 public class CenterPanel <T> extends JPanel implements ActionListener {
 
     private Controller controller;
     private JPanel grid = new JPanel();
-    private JList<T> dialog = new JList<>();
+    private JList<T> jlistDialog = new JList<>();
     private MainFrame mainFrame;
 
 
@@ -23,23 +21,23 @@ public class CenterPanel <T> extends JPanel implements ActionListener {
 
         grid.setPreferredSize(new Dimension(700, 350));
 
-        dialog.setPreferredSize(new Dimension(500,350));
-        grid.add(dialog, BorderLayout.WEST);
+        jlistDialog.setPreferredSize(new Dimension(500,350));
+        grid.add(jlistDialog, BorderLayout.WEST);
 
         add(grid);
 
     }
 
-    public JList<T> getDialog() {
-        return dialog;
+    public JList<T> getJlistDialog() {
+        return jlistDialog;
     }
 
-    public void setDialog(JList<T> dialog) {
-        this.dialog = dialog;
+    public void setJlistDialog(JList<T> jlistDialog) {
+        this.jlistDialog = jlistDialog;
     }
 
     public void addToDialog(T[] obj){
-        dialog.setListData(obj);
+        jlistDialog.setListData(obj);
     }
 
    /* public void paint(Graphics g) {
