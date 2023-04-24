@@ -8,65 +8,32 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-public class CenterPanel <T> extends JPanel implements ActionListener {
+public class CenterPanel extends JPanel implements ActionListener {
+    private final ArrayList<Object> currConversation = new ArrayList<>();
+    private final JList<Object> jlistConversation = new JList<>();
 
-    private Controller controller;
-    private JPanel grid = new JPanel();
-    private JList<T> jlistDialog = new JList<>();
-    private MainFrame mainFrame;
-
-
-    public CenterPanel(MainFrame mainFrame, Controller controller) {
-        this.mainFrame = mainFrame;
-        this.controller = controller;
-
+    public CenterPanel() {
+        jlistConversation.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        jlistConversation.setLayoutOrientation(JList.VERTICAL);
+        jlistConversation.setVisibleRowCount(-1);
+        JScrollPane listScroller = new JScrollPane(jlistConversation);
+        listScroller.setPreferredSize(new Dimension(350, 350));
+        JPanel grid = new JPanel();
         grid.setPreferredSize(new Dimension(700, 350));
-
-        jlistDialog.setPreferredSize(new Dimension(500,350));
-        grid.add(jlistDialog, BorderLayout.WEST);
-
+        grid.add(listScroller, BorderLayout.WEST);
         add(grid);
-
     }
 
-    public JList<T> getJlistDialog() {
-        return jlistDialog;
+    public void updateCenterPanel(String user, String currentReceiver, String recentMessage, Icon recentImage){
+        currConversation.add(user + " - " + recentMessage);
+        if (recentImage!=null) {
+            currConversation.add(recentImage);
+        }
+        Object[] listData = currConversation.toArray();
+        jlistConversation.setListData(listData);
     }
 
-    public void setJlistDialog(JList<T> jlistDialog) {
-        this.jlistDialog = jlistDialog;
-    }
-
-    public void addToDialog(T[] obj){
-
-        //jlistDialog.setListData(obj);
-        String[] str = {"test", "test2"};
-        jlistDialog.setListData((T[]) str);
-
-        T[] icon = obj;
-        //ScaledImage(icon.getImage(), lblPhotoField.getWidth(), lblPhotoField.getHeight());
-
-        ArrayList<Icon> cars = new ArrayList<Icon>(); // Create an ArrayList object
-
-        //Icon icon = new ImageIcon("images/gubbe.jpg");
-        //Icon ic
-        //cars.add(new ImageIcon("images/gubbe.jpg"));
-
-        icon[0] = (T) new ImageIcon("images/gubbe.jpg");
-
-        jlistDialog.setListData(icon);
-    }
-
-   /* public void paint(Graphics g) {
-        g.drawImage( image, 0, 0, null);
-    }
-    */
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        String buttonText = ((JButton) e.getSource()).getText();
-    }
-
-
-
+    public void actionPerformed(ActionEvent e) {}
 }

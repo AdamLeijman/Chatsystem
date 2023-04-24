@@ -2,6 +2,8 @@ package controller;
 
 import boundary.MainFrame;
 
+import javax.swing.*;
+
 public class Controller {
     private MainFrame view;
 
@@ -13,11 +15,5 @@ public class Controller {
         return view;
     }
 
-    public void buttonPressed() {
 
-    }
-
-    public void testUpdateGUI(String text, String from_user) {
-        view.testUpdateGUI(text, from_user);
-    }
 }
