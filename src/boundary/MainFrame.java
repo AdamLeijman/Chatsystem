@@ -15,7 +15,7 @@ public class MainFrame {
     private Client client;
     private String user;
     private String currentReceiver;
-    
+
     public MainFrame(Controller controller, Client client) {
         this.client = client;
         this.controller = controller;
