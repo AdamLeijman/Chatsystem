@@ -41,6 +41,11 @@ public class CenterPanel <T> extends JPanel implements ActionListener {
         jlistDialog.setListData(obj);
         String[] str = {"test", "test2"};
         jlistDialog.setListData((T[]) str);
+
+        ImageIcon[] icon = new ImageIcon[20];
+        icon[1] = new ImageIcon("images/gubbe.jpg");
+
+        jlistDialog.setListData((T[]) icon);
     }
 
    /* public void paint(Graphics g) {
