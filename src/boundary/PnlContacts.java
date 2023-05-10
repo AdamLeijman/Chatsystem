@@ -6,8 +6,8 @@ import java.awt.*;
 public class PnlContacts extends JPanel {
     private JPanel pnlView;
     private MainFrame mainFrame;
-    private JList<Object> contacts;
-    private JList<Object> connectedUsers;
+    private JList<String> contacts;
+    private JList<String> connectedUsers;
 
     public PnlContacts(MainFrame mainFrame) {
         this.mainFrame=mainFrame;
@@ -42,22 +42,21 @@ public class PnlContacts extends JPanel {
         add(pnlView);
     }
 
-    public JList<Object> getConnectedUsers() {
+    public JList<String> getConnectedUsers() {
         return connectedUsers;
     }
 
-    public void setConnectedUsers(Object[] connUsers) {
+    public void setConnectedUsers(String[] connUsers) {
         connectedUsers.setListData(connUsers);
     }
 
-    public JList<Object> getContacts() {
+    public JList<String> getContacts() {
         return contacts;
     }
 
-    public void setContacts(JList<Object> contacts) {
+    public void setContacts(JList<String> contacts) {
         this.contacts = contacts;
     }
-
 
 
 }

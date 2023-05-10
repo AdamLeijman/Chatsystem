@@ -59,14 +59,14 @@ public class PnlWriteMessage extends JPanel {
                     lblIcon.setIcon(ii);
                     Icon icon = new ImageIcon(f.getPath());
                     currTextMessage = write.getText();
-                    mainFrame.updateConversation("south", "south", currTextMessage, icon);
+                    mainFrame.updateConversation("adam", "hej", currTextMessage, icon);
                     write.setText("");
                 }
             } catch (Exception e) {
             }
         } else {
             currTextMessage = write.getText();
-            mainFrame.updateConversation("south", "south", currTextMessage, null);
+            mainFrame.updateConversation("hej", "adam", currTextMessage, null);
             write.setText("");
         }
     }

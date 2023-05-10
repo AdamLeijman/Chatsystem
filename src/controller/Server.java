@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 public class Server {
-    private ArrayList<User> connectedUsers = new ArrayList<>();
+    private ArrayList<Client> connectedUsers = new ArrayList<>();
     private Clients clients;
     private ServerUI serverUI;
     private UnsendMessages unsendMessages;
@@ -67,7 +67,7 @@ public class Server {
         serverUI.addInfo(trafficList);
     }
 
-    public ArrayList<User> getConnectedUsers() {
+    public ArrayList<Client> getConnectedUsers() {
         return connectedUsers;
     }
 
@@ -114,36 +114,47 @@ public class Server {
 
                     oos = new ObjectOutputStream(socket.getOutputStream());
                     ois = new ObjectInputStream(socket.getInputStream());
-                    oos.writeObject(clients);
-                    oos.flush();
+
 
                     //Test
-                    Message testMessage = new Message("test to receive", new ImageIcon());
-                    oos.writeObject(testMessage);
+                    //Message testMessage = new Message("test to receive", new ImageIcon());
+                    //oos.writeObject(testMessage);
 
-                    Object obj = ois.readObject();
-                    if (obj instanceof User) {
-                        senderUser = (User) obj;
-                        System.out.println("Server: User connected to server");
-                    }
+                    //Object obj = ois.readObject();
+                    //if (obj instanceof User) {
+                      //  senderUser = (User) obj;
+                        //System.out.println("Server: User connected to server");
+                    //}
 
-                    Message currMessage;
+                    Object object;
                     //syfte läs in meddelande objekt och skicka det till user om
                     //hen är online annars lagra messageobjektet i unsendmessages-klassen
                     while(true){
-                        currMessage = (Message) ois.readObject();
-                        if (currMessage!=null) {
+
+
+
+                        object = ois.readObject();
+
+                        if (object instanceof Client) {
+                            connectedUsers.add((Client) object);
+                            System.out.println("CLIENT ADDED -----------");
+                        }
+
+                        if (object instanceof Message) {
+                            oos.writeObject(object);
+                            oos.flush();
                         //obj = ois.readObject();
-                        //currMessage = (Message) obj;
-                        //currMessage = (Message) ois.readObject();
+                        //object = (Message) obj;
+                        //object = (Message) ois.readObject();
+
                         System.out.println("hej");
-                        logTraffic(currMessage);
-                        ArrayList<User> receivers = currMessage.getReceivers();
-                        System.out.println("hej2" + currMessage.getReceivers());
-                        for (User currReceiverUser : receivers) {
+                        logTraffic((Message) object);
+                        User receiver = (((Message) object).getReceiver());
+                        //System.out.println("hej2" + object.getReceivers());
+                           /* for (User currReceiverUser : receivers) {
                             System.out.println("hej3 connectedUsers.size()" + connectedUsers.size());
                             if (connectedUsers.size() == 0) {
-                                unsendMessages.put(currReceiverUser, currMessage);
+                                unsendMessages.put(currReceiverUser, object);
                                 System.out.println("Server: receiver offline, Message stored");
                             } else {
                                 for (int i = 0; i < connectedUsers.size(); i++) {
@@ -153,14 +164,21 @@ public class Server {
                                         currReceiverClient.receiveMessage();
                                     } else {
                                         if (i == connectedUsers.size() - 1) {
-                                            unsendMessages.put(currReceiverUser, currMessage);
+                                            unsendMessages.put(currReceiverUser, object);
                                         }
                                     }
                                 }
                             }
                         }
+                        */
+
+
                         //System.out.println("HEJ");
-                    }
+                    } else if (object instanceof Client) {
+                            //clients.put((User) obj, (Client) object);
+                            oos.writeObject(clients);
+                            oos.flush();
+                        }
                     }
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();

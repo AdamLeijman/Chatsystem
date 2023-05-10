@@ -21,7 +21,7 @@ public class test {
 
         for (int i=0; i<1000;i++){}
 
-        Client client = new Client();
+       // Client client = new Client();
         for (int i=0; i<1000;i++){}
 
 

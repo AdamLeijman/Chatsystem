@@ -9,7 +9,7 @@ public class UnsendMessages {
     // egna tillägg
     public synchronized void put(User user, Message message) {
         // hämta ArrayList – om null skapa en och placera i unsend
-        System.out.println(message.getText() + "AAA" + message.getReceivers());
+       // System.out.println(message.getText() + "AAA" + message.getReceivers());
 
         //map.get("vishal")
         if (unsentMap.get(user)==null){

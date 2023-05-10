@@ -3,17 +3,14 @@ package controller;
 import boundary.MainFrame;
 
 import javax.swing.*;
+import java.util.ArrayList;
 
 public class Controller {
-    private MainFrame view;
+    //private MainFrame view;
 
-    public Controller(Client client) {
-        view = new MainFrame(this, client);
+    public Controller() {
+        Client client = new Client();
+        //view = new MainFrame(this, client);
     }
-
-    public MainFrame getView() {
-        return view;
-    }
-
 
 }
