@@ -77,13 +77,12 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        sendMessage();
-        //receiveMessage();
-        sendMessageThread.start();
+
         receiveMessage();
         receiveMessageThread.start();
     }
 
+    /*
     public void sendMessage() {
         //sendMessageThread = new Thread(this);
         sendMessageThread = new Thread(new Runnable() {
@@ -99,8 +98,9 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
                 }
             }
         });
-    }
+    }*/
 
+    /*
     public void userSendsMessage(String[] str, User receiver) throws IOException {
 
         Message message = new Message(str[0], new ImageIcon("images/gubbe.jpg"));
@@ -111,7 +111,7 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
         oos.flush();
         message.clearReceivers();
         //message = new Message("new Message");
-    }
+    }*/
 
     public void receiveMessage() {
         receiveMessageThread = new Thread(new Runnable() {
