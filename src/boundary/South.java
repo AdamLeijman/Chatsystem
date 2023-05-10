@@ -8,14 +8,21 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
-public class SouthPanel extends JPanel implements ActionListener {
-    private MainFrame mainFrame;
+public class South extends JPanel implements ActionListener {
+   private MainFrame mainFrame;
     private JButton send, add, pic;
     private JTextArea write;
     private JLabel lblIcon;
+    private Controller controller;
+    private JButton btnStartS;            // Button start producer 1
+    private JButton btnStopS;            // Button stop producer 1
+    private JLabel lblStatusS;
 
-    public SouthPanel(MainFrame mainFrame) {
-        this.mainFrame = mainFrame;
+    public South(Controller controller) {
+        this.controller = controller;
+        createSouth();
+/*
+        this.controller=controller;
         BorderLayout layout = new BorderLayout();
         setLayout(layout);
         JPanel pnlButtons = new JPanel();
@@ -42,8 +49,41 @@ public class SouthPanel extends JPanel implements ActionListener {
                 updateConversation(true);
             }
         });
-        add(pnlButtons);
+        add(pnlButtons);*/
     }
+
+    private void createSouth() {
+        setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black), "  Producers  "));
+        setBounds(13, 13, 413, 413);
+        BorderLayout layout = new BorderLayout();
+        setLayout(null);
+
+        //Write
+        write = new JTextArea("Write message here");
+        write.setPreferredSize(new Dimension(400, 20));
+        add(write, BorderLayout.SOUTH);
+
+        //Button send
+        send = new JButton("Start Producing");
+        send.setBounds(10, 59, 125, 23);
+        send.addActionListener(l -> {
+            //controller.startProducer(0);   //TO DO
+            btnStartS.setEnabled(false);
+            System.out.print("SENT");
+        }); //actionlistener to controller method
+        add(send);
+
+        //Button stop
+        pic = new JButton("Stop");
+        pic.setBounds(140, 59, 65, 23);
+        btnStopS.addActionListener(l -> {
+            //controller.stopProducer(0);  //TO DO
+            btnStartS.setEnabled(true);
+        }); //actionlistener to controller method
+        add(btnStopS);
+
+    }
+
 
     public void updateConversation(Boolean imageAndText)  {
         String currTextMessage = "";

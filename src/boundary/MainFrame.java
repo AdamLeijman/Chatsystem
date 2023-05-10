@@ -5,7 +5,6 @@ import controller.Controller;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 
 public class MainFrame {
 
@@ -15,6 +14,8 @@ public class MainFrame {
     private Client client;
     private String user;
     private String currentReceiver;
+    private South pnlWriteMessage;
+    private Center pnlDisplayChat;
 
     public MainFrame(Controller controller, Client client) {
         this.controller = controller;
@@ -23,7 +24,8 @@ public class MainFrame {
         frame = new JFrame();
         frame.setBounds(0, 0, 730, 526);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLayout(null);
+        BorderLayout layout = new BorderLayout();
+        frame.setLayout(layout);
         frame.setTitle("Chat application");
 
         InitializeGUI();					// Fill in components
@@ -56,11 +58,11 @@ public class MainFrame {
     }
 
     private void InitializeGUI() {
-        pnlWriteMessage = new pnlWriteMessage(controller);
-        frame.add(pnlBuffer);
+        pnlWriteMessage = new South(controller);
+        frame.add(pnlWriteMessage, BorderLayout.SOUTH);
 
-        pnlProducers = new PanelProducers(controller);
-        frame.add(pnlProducers);
+        pnlDisplayChat = new Center(controller);
+        frame.add(pnlDisplayChat);
 
 //        pnlConsumers = new PanelConsumers(controller);
   //      frame.add(pnlConsumers);
@@ -79,7 +81,7 @@ public class MainFrame {
     }
 
 
-    public CenterPanel getCenter() { //
-        return (CenterPanel) center;
+    public Center getCenter() { //
+        return (Center) center;
     }
 }

@@ -8,11 +8,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-public class CenterPanel extends JPanel implements ActionListener {
+public class Center extends JPanel implements ActionListener {
     private final ArrayList<Object> currConversation = new ArrayList<>();
     private final JList<Object> jlistConversation = new JList<>();
+    private Controller controller;
 
-    public CenterPanel() {
+    public Center(Controller controller) {
+        this.controller =controller;
         jlistConversation.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         jlistConversation.setLayoutOrientation(JList.VERTICAL);
         jlistConversation.setVisibleRowCount(-1);
