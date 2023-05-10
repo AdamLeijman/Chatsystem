@@ -60,8 +60,8 @@ public class South extends JPanel implements ActionListener {
 
         //Write
         write = new JTextArea("Write message here");
-        write.setPreferredSize(new Dimension(400, 20));
-        add(write, BorderLayout.SOUTH);
+        write.setBounds(10, 10, 400, 20);
+        add(write);
 
         //Button send
         send = new JButton("Start Producing");
