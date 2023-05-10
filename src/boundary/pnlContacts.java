@@ -2,15 +2,14 @@ package boundary;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Arrays;
 
-public class EastPanel extends JPanel {
+public class pnlContacts extends JPanel {
     private JPanel pnlView;
     private MainFrame mainFrame;
     private JList<Object> contacts;
     private JList<Object> connectedUsers;
 
-    public EastPanel(MainFrame mainFrame) {
+    public pnlContacts(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
         BorderLayout layout = new BorderLayout();
         setLayout(layout);

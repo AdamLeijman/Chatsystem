@@ -40,6 +40,10 @@ public class MainFrame {
         pnlDisplayChat.setPreferredSize(new Dimension(700, 500));
         frame.add(pnlDisplayChat);
 
+        pnlDisplayChat = new PnlDisplayChat(this);
+        pnlDisplayChat.setPreferredSize(new Dimension(700, 500));
+        frame.add(pnlDisplayChat);
+
 //        pnlConsumers = new PanelConsumers(controller);
   //      frame.add(pnlConsumers);
     }
