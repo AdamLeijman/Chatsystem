@@ -14,15 +14,14 @@ public class South extends JPanel implements ActionListener {
     private JTextArea write;
     private JLabel lblIcon;
     private Controller controller;
-    private JButton btnStartS;            // Button start producer 1
-    private JButton btnStopS;            // Button stop producer 1
-    private JLabel lblStatusS;
 
-    public South(Controller controller) {
-        this.controller = controller;
+    public South(MainFrame mainFrame) {
+        this.mainFrame=mainFrame;
         createSouth();
-/*
-        this.controller=controller;
+
+    }
+
+    private void createSouth() {
         BorderLayout layout = new BorderLayout();
         setLayout(layout);
         JPanel pnlButtons = new JPanel();
@@ -49,38 +48,7 @@ public class South extends JPanel implements ActionListener {
                 updateConversation(true);
             }
         });
-        add(pnlButtons);*/
-    }
-
-    private void createSouth() {
-        setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black), "  Producers  "));
-        setBounds(13, 13, 413, 413);
-        BorderLayout layout = new BorderLayout();
-        setLayout(null);
-
-        //Write
-        write = new JTextArea("Write message here");
-        write.setBounds(10, 10, 400, 20);
-        add(write);
-
-        //Button send
-        send = new JButton("Start Producing");
-        send.setBounds(10, 59, 125, 23);
-        send.addActionListener(l -> {
-            //controller.startProducer(0);   //TO DO
-            btnStartS.setEnabled(false);
-            System.out.print("SENT");
-        }); //actionlistener to controller method
-        add(send);
-
-        //Button stop
-        pic = new JButton("Stop");
-        pic.setBounds(140, 59, 65, 23);
-        btnStopS.addActionListener(l -> {
-            //controller.stopProducer(0);  //TO DO
-            btnStartS.setEnabled(true);
-        }); //actionlistener to controller method
-        add(btnStopS);
+        add(pnlButtons);
 
     }
 

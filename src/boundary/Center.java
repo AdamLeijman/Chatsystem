@@ -11,10 +11,10 @@ import java.util.ArrayList;
 public class Center extends JPanel implements ActionListener {
     private final ArrayList<Object> currConversation = new ArrayList<>();
     private final JList<Object> jlistConversation = new JList<>();
-    private Controller controller;
+    private MainFrame mainFrame;
 
-    public Center(Controller controller) {
-        this.controller =controller;
+    public Center(MainFrame mainFrame) {
+        this.mainFrame =mainFrame;
         jlistConversation.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         jlistConversation.setLayoutOrientation(JList.VERTICAL);
         jlistConversation.setVisibleRowCount(-1);
