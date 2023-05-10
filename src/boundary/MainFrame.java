@@ -1,22 +1,20 @@
 package boundary;
 
-import controller.Client;
-import controller.Controller;
+import controller.User;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class MainFrame {
     private JFrame frame;
-    private Client client;
+    private User user;
     private PnlWriteMessage pnlWriteMessage;
     private PnlChat pnlChat;
     private PnlContacts pnlContacts;
 
-    public MainFrame(Client client) {
-        this.client = client;
+    public MainFrame(User user) {
+        this.user = user;
 
         frame = new JFrame();
         frame.setBounds(0, 0, 1000, 526);
@@ -47,11 +45,11 @@ public class MainFrame {
     }
 
     public void updateConversation(String user, String currentReceiver, String recentMessage, Icon recentImage){
-        user = client.getUsername();
+        user = this.user.getUsername();
         //System.out.println(user + currentReceiver + recentMessage + recentImage);
         pnlChat.updateCenterPanel(user, currentReceiver, recentMessage, recentImage);
         try {
-            client.userSendsMessage(user, currentReceiver, recentMessage, recentImage);
+            this.user.userSendsMessage(user, currentReceiver, recentMessage, recentImage);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

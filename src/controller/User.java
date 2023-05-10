@@ -10,7 +10,7 @@ import java.net.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-public class Client extends Thread implements Runnable, Callback, Serializable {
+public class User extends Thread implements Runnable, Callback, Serializable {
     private final int port = 5555;
     private ObjectOutputStream oos;
     private ObjectInputStream ois;
@@ -19,27 +19,21 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
     private Socket socket;
     private Thread sendMessageThread;
     private Thread receiveMessageThread;
-    private User user;
+    private entity.User user;
     private Message message;
     private MainFrame view;
     private Clients clients;
 
-    public Client() {
+    public User() {
         view = new MainFrame(this);
         clients = new Clients();
         selectUserInfo();
-        newClient();
-        //ui.addListener((control.Callback) this);
-        message = new Message("testMessage");
+        receiveMessage();
+        receiveMessageThread.start();
     }
 
     public void selectUserInfo() {
         try {
-            /*BufferedReader bf = new BufferedReader(new FileReader("files/ExistingUser.txt"));
-            String existingUser = bf.readLine();
-            ImageIcon existingAvatar = new ImageIcon(bf.readLine());
-
-             */
             String existingUser = null;
             ImageIcon existingAvatar = null;
             if(existingUser == null) {
@@ -58,56 +52,23 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
                     bw.write("avatars/1.jpeg" + "\n");
                 }
                 bw.close();
-                user = new User(name, avatar);
+                user = new entity.User(name, avatar);
             } else{
-                user = new User(existingUser, existingAvatar);
+                user = new entity.User(existingUser, existingAvatar);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void newClient() {
-        //ip = InetAddress.getByName(localHost);
-        System.out.println("Client: created");
-        try {
-            socket = new Socket("127.0.0.1", 5555);
-            System.out.println("Client: connected");
-            oos = new ObjectOutputStream(socket.getOutputStream());
-            ois = new ObjectInputStream(socket.getInputStream());
-            //TODO Check for unsent messages!
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        receiveMessage();
-        receiveMessageThread.start();
-    }
-
-    /*
-    public void sendMessage() {
-        //sendMessageThread = new Thread(this);
-        sendMessageThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    System.out.println("Client: sendMessage loop is active");
-                    oos.writeObject(user);
-                    oos.flush();
-                    //userSendsMessage();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-    }*/
 
 
     public void userSendsMessage(String user, String currentReceiver, String recentMessage, Icon recentImage) throws IOException {
 
-        User userCURR = null;
-        User[] users = clients.getUsers();
-        for(User u : users){
+        entity.User userCURR = null;
+        entity.User[] users = clients.getUsers();
+        for(entity.User u : users){
             if(currentReceiver.equals(u.getUsername())) {
                 userCURR = u;
                 break;
@@ -134,19 +95,29 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
             @Override
             public void run() {
                 try {
-                    System.out.println("Client: receiveMessage loop is active");
-                    boolean success = true;
-                    /*while (success) {
-                        System.out.println("Client: INside while loop");
-                        if (ois.readObject() instanceof Clients) {
-                            Clients clients = (Clients) ois.readObject();
-                            clients.put(user, Client.this);
-                            success = false;
-                        }
-                    }*/
-                    //lägg till i client och user clients object
+                    socket = new Socket("127.0.0.1", 5556);
+                    oos = new ObjectOutputStream(socket.getOutputStream());
+                    ois = new ObjectInputStream(socket.getInputStream());
+                    oos.writeObject(user);
+                    oos.flush();
 
+                    Object object;
+                    while(true){
+                        object = ois.readObject();
+                        if (object instanceof String){
+                            System.out.print(object);
+                        }
+                    }
+                } catch (IOException | ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+                /*try {
+                    oos.writeObject("OK from Client");
                     while (true) {
+
+
+
                         Object obj = ois.readObject();
                         System.out.println("Client: object received");
 
@@ -177,7 +148,7 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
                     }
                 } catch (IOException | ClassNotFoundException e) {
                     throw new RuntimeException(e);
-                }
+                }*/
             }
         });
     }
@@ -186,7 +157,7 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
         return user.getUsername();
     }
 
-    public void chooseReceiver(User user) {
+    public void chooseReceiver(entity.User user) {
         message.setReceiver(user);
     }
 
@@ -206,7 +177,7 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
 
     //Syftet med addToContacts är att få in en user, hämta alla nuvarande kontakter från textfilen för att inte
     // skriva över nuvarande kontakter och addera summan till textfilen
-    public void addToContacts(User newContact) {
+    public void addToContacts(entity.User newContact) {
         BufferedReader bf = null;
         ArrayList<String> tempList = new ArrayList<String>();
         try {

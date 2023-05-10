@@ -3,7 +3,6 @@ package controller;
 import boundary.ServerUI;
 import entity.*;
 
-import javax.swing.*;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -11,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 public class Server {
-    private ArrayList<Client> connectedUsers = new ArrayList<>();
+    private ArrayList<User> connectedUsers = new ArrayList<>();
     private Clients clients;
     private ServerUI serverUI;
     private UnsendMessages unsendMessages;
@@ -67,7 +66,7 @@ public class Server {
         serverUI.addInfo(trafficList);
     }
 
-    public ArrayList<Client> getConnectedUsers() {
+    public ArrayList<User> getConnectedUsers() {
         return connectedUsers;
     }
 
@@ -99,7 +98,7 @@ public class Server {
             private ObjectOutputStream oos;
             private ObjectInputStream ois;
             private Socket socket;
-            private User senderUser;
+            private entity.User senderUser;
             //private Message currMessage;
 
             public ClientHandler(Socket socket) {
@@ -110,13 +109,30 @@ public class Server {
             @Override
             public void run() {
                 try {
-                    System.out.println("Server: RUNNNINGGGGGGG");
-
                     oos = new ObjectOutputStream(socket.getOutputStream());
                     ois = new ObjectInputStream(socket.getInputStream());
+                    oos.writeObject("Ok from server");
+                    oos.flush();
 
+                    Object object;
+                    while(true){
+                        object = ois.readObject();
+                        if (object instanceof String){
+                            System.out.print(object);
+                        }
+                        if (object instanceof User){
+                            System.out.print("USER");
+                            clients.put(object);
 
-                    //Test
+                        }
+
+                        oos.writeObject(clients);
+                    }
+                } catch (IOException | ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+                //Test
                     //Message testMessage = new Message("test to receive", new ImageIcon());
                     //oos.writeObject(testMessage);
 
@@ -126,10 +142,9 @@ public class Server {
                         //System.out.println("Server: User connected to server");
                     //}
 
-                    Object object;
                     //syfte läs in meddelande objekt och skicka det till user om
                     //hen är online annars lagra messageobjektet i unsendmessages-klassen
-                    while(true){
+                    /*while(true){
 
 
 
@@ -170,7 +185,7 @@ public class Server {
                                 }
                             }
                         }
-                        */
+
 
 
                         //System.out.println("HEJ");
@@ -179,10 +194,8 @@ public class Server {
                             oos.writeObject(clients);
                             oos.flush();
                         }
-                    }
-                } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
+                    }*/
+
             }
         }
     }
