@@ -1,19 +1,17 @@
 package boundary;
 
-import controller.Controller;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-public class Center extends JPanel implements ActionListener {
+public class PnlDisplayChat extends JPanel implements ActionListener {
     private final ArrayList<Object> currConversation = new ArrayList<>();
     private final JList<Object> jlistConversation = new JList<>();
     private MainFrame mainFrame;
 
-    public Center(MainFrame mainFrame) {
+    public PnlDisplayChat(MainFrame mainFrame) {
         this.mainFrame =mainFrame;
         jlistConversation.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         jlistConversation.setLayoutOrientation(JList.VERTICAL);

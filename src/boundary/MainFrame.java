@@ -7,15 +7,11 @@ import javax.swing.*;
 import java.awt.*;
 
 public class MainFrame {
-
     private Controller controller;
     private JFrame frame;
-    private JPanel south, east, center;
     private Client client;
-    private String user;
-    private String currentReceiver;
-    private South pnlWriteMessage;
-    private Center pnlDisplayChat;
+    private PnlWriteMessage pnlWriteMessage;
+    private PnlDisplayChat pnlDisplayChat;
 
     public MainFrame(Controller controller, Client client) {
         this.controller = controller;
@@ -36,11 +32,11 @@ public class MainFrame {
     }
 
     private void InitializeGUI() {
-        pnlWriteMessage = new South(this);
+        pnlWriteMessage = new PnlWriteMessage(this);
         pnlWriteMessage.setPreferredSize(new Dimension(100, 100));
         frame.add(pnlWriteMessage, BorderLayout.SOUTH);
 
-        pnlDisplayChat = new Center(this);
+        pnlDisplayChat = new PnlDisplayChat(this);
         pnlDisplayChat.setPreferredSize(new Dimension(700, 500));
         frame.add(pnlDisplayChat);
 

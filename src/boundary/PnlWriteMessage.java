@@ -8,14 +8,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
-public class South extends JPanel implements ActionListener {
+public class PnlWriteMessage extends JPanel implements ActionListener {
    private MainFrame mainFrame;
     private JButton send, add, pic;
     private JTextArea write;
     private JLabel lblIcon;
     private Controller controller;
 
-    public South(MainFrame mainFrame) {
+    public PnlWriteMessage(MainFrame mainFrame) {
         this.mainFrame=mainFrame;
         createSouth();
 
