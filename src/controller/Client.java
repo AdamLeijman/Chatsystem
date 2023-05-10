@@ -75,15 +75,13 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
             System.out.println("Client: connected");
             oos = new ObjectOutputStream(socket.getOutputStream());
             ois = new ObjectInputStream(socket.getInputStream());
-            oos.writeObject(this);
-            oos.flush();
             //TODO Check for unsent messages!
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        //receiveMessage();
-        //receiveMessageThread.start();
+        receiveMessage();
+        receiveMessageThread.start();
     }
 
     /*
@@ -154,7 +152,7 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
 
                         if (obj instanceof Clients) {
                             clients = (Clients) obj;
-                            //clients.put(user, );
+                            clients.put(user, Client.this);
                             view.updateConnUsers(clients.getList());
                             System.out.println("!!!!!");
                         }
