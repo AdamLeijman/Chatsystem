@@ -6,13 +6,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-public class PnlDisplayChat extends JPanel implements ActionListener {
+public class PnlChat extends JPanel {
     private final ArrayList<Object> currConversation = new ArrayList<>();
     private final JList<Object> jlistConversation = new JList<>();
     private MainFrame mainFrame;
 
-    public PnlDisplayChat(MainFrame mainFrame) {
-        this.mainFrame =mainFrame;
+    public PnlChat(MainFrame mainFrame) {
+        this.mainFrame=mainFrame;
+        createPanel();
+    }
+
+    private void createPanel() {
         jlistConversation.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         jlistConversation.setLayoutOrientation(JList.VERTICAL);
         jlistConversation.setVisibleRowCount(-1);
@@ -34,6 +38,4 @@ public class PnlDisplayChat extends JPanel implements ActionListener {
     }
 
 
-    @Override
-    public void actionPerformed(ActionEvent e) {}
 }
