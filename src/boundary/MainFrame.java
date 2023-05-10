@@ -11,7 +11,8 @@ public class MainFrame {
     private JFrame frame;
     private Client client;
     private PnlWriteMessage pnlWriteMessage;
-    private PnlDisplayChat pnlDisplayChat;
+    private PnlChat pnlChat;
+    private PnlContacts pnlContacts;
 
     public MainFrame(Controller controller, Client client) {
         this.controller = controller;
@@ -36,22 +37,23 @@ public class MainFrame {
         pnlWriteMessage.setPreferredSize(new Dimension(100, 100));
         frame.add(pnlWriteMessage, BorderLayout.SOUTH);
 
-        pnlDisplayChat = new PnlDisplayChat(this);
-        pnlDisplayChat.setPreferredSize(new Dimension(700, 500));
-        frame.add(pnlDisplayChat);
+        pnlChat = new PnlChat(this);
+        pnlChat.setPreferredSize(new Dimension(700, 500));
+        frame.add(pnlChat);
 
-        pnlDisplayChat = new PnlDisplayChat(this);
-        pnlDisplayChat.setPreferredSize(new Dimension(700, 500));
-        frame.add(pnlDisplayChat);
+        pnlChat = new PnlChat(this);
+        pnlChat.setPreferredSize(new Dimension(700, 500));
+        frame.add(pnlChat);
 
-//        pnlConsumers = new PanelConsumers(controller);
-  //      frame.add(pnlConsumers);
+        pnlContacts = new PnlContacts(this);
+        pnlContacts.setPreferredSize(new Dimension(700, 500));
+        frame.add(pnlChat);
     }
 
     public void updateConversation(String user, String currentReceiver, String recentMessage, Icon recentImage){
         user = client.getUsername();
         System.out.println(user + currentReceiver + recentMessage + recentImage);
-        pnlDisplayChat.updateCenterPanel(user, currentReceiver, recentMessage, recentImage);
+        pnlChat.updateCenterPanel(user, currentReceiver, recentMessage, recentImage);
     }
 
 }

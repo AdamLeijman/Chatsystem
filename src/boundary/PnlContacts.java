@@ -3,13 +3,13 @@ package boundary;
 import javax.swing.*;
 import java.awt.*;
 
-public class pnlContacts extends JPanel {
+public class PnlContacts extends JPanel {
     private JPanel pnlView;
     private MainFrame mainFrame;
     private JList<Object> contacts;
     private JList<Object> connectedUsers;
 
-    public pnlContacts(MainFrame mainFrame) {
+    public PnlContacts(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
         BorderLayout layout = new BorderLayout();
         setLayout(layout);
