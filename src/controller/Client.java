@@ -36,9 +36,13 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
 
     public void selectUserInfo() {
         try {
-            BufferedReader bf = new BufferedReader(new FileReader("files/ExistingUser.txt"));
+            /*BufferedReader bf = new BufferedReader(new FileReader("files/ExistingUser.txt"));
             String existingUser = bf.readLine();
             ImageIcon existingAvatar = new ImageIcon(bf.readLine());
+
+             */
+            String existingUser = null;
+            ImageIcon existingAvatar = null;
             if(existingUser == null) {
                 BufferedWriter bw = new BufferedWriter(new FileWriter("files/ExistingUser.txt"));
                 String name = JOptionPane.showInputDialog(null, "Enter name");
