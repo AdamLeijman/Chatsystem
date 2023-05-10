@@ -19,7 +19,7 @@ public class MainFrame {
         this.client = client;
 
         frame = new JFrame();
-        frame.setBounds(0, 0, 730, 526);
+        frame.setBounds(0, 0, 1000, 526);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         BorderLayout layout = new BorderLayout();
         frame.setLayout(layout);
@@ -39,15 +39,11 @@ public class MainFrame {
 
         pnlChat = new PnlChat(this);
         pnlChat.setPreferredSize(new Dimension(700, 500));
-        frame.add(pnlChat);
-
-        pnlChat = new PnlChat(this);
-        pnlChat.setPreferredSize(new Dimension(700, 500));
-        frame.add(pnlChat);
+        frame.add(pnlChat, BorderLayout.CENTER);
 
         pnlContacts = new PnlContacts(this);
-        pnlContacts.setPreferredSize(new Dimension(700, 500));
-        frame.add(pnlChat);
+        pnlContacts.setPreferredSize(new Dimension(500, 300));
+        frame.add(pnlContacts, BorderLayout.EAST);
     }
 
     public void updateConversation(String user, String currentReceiver, String recentMessage, Icon recentImage){

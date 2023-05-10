@@ -4,16 +4,13 @@ import controller.Controller;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 
-public class PnlWriteMessage extends JPanel implements ActionListener {
+public class PnlWriteMessage extends JPanel {
    private MainFrame mainFrame;
-    private JButton send, add, pic;
+    private JButton send, add, image;
     private JTextArea write;
     private JLabel lblIcon;
-    private Controller controller;
 
     public PnlWriteMessage(MainFrame mainFrame) {
         this.mainFrame=mainFrame;
@@ -27,31 +24,25 @@ public class PnlWriteMessage extends JPanel implements ActionListener {
         JPanel pnlButtons = new JPanel();
         add = new JButton("Add contact");
         send = new JButton("Send");
-        pic = new JButton("Add picture");
+        image = new JButton("Add picture");
         write = new JTextArea("Write message here");
         write.setPreferredSize(new Dimension(400, 20));
+
+        send.addActionListener(l -> {
+            updateConversation(false);
+        });
+
+        image.addActionListener(l -> {
+            updateConversation(true);
+        });
+
         pnlButtons.add(write, BorderLayout.SOUTH);
         pnlButtons.add(send, BorderLayout.SOUTH);
         pnlButtons.add(add, BorderLayout.SOUTH);
-        pnlButtons.add(pic, BorderLayout.SOUTH);
-
-        send.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateConversation(false);
-            }
-        });
-
-        pic.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateConversation(true);
-            }
-        });
+        pnlButtons.add(image, BorderLayout.SOUTH);
         add(pnlButtons);
 
     }
-
 
     public void updateConversation(Boolean imageAndText)  {
         String currTextMessage = "";
@@ -80,6 +71,5 @@ public class PnlWriteMessage extends JPanel implements ActionListener {
         }
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {}
+
 }

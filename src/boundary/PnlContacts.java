@@ -10,7 +10,11 @@ public class PnlContacts extends JPanel {
     private JList<Object> connectedUsers;
 
     public PnlContacts(MainFrame mainFrame) {
-        this.mainFrame = mainFrame;
+        this.mainFrame=mainFrame;
+        createPanel();
+    }
+
+    private void createPanel() {
         BorderLayout layout = new BorderLayout();
         setLayout(layout);
 
