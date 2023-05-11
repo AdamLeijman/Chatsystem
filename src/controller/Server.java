@@ -120,7 +120,7 @@ public class Server {
                     Client client = new Client();
                     client.setSocket(socket);
                     clients.put(specificUser, client); //FIXA DENNA
-
+                    System.out.println("User connected to server and added to clients");
                     //Test
                     Message testMessage = new Message("test to receive", new ImageIcon());
                     oos.writeObject(testMessage);
