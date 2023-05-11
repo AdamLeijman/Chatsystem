@@ -99,7 +99,7 @@ public class Server {
             private ObjectOutputStream oos;
             private ObjectInputStream ois;
             private Socket socket;
-            private User senderUser;
+            private User specificUser;
             //private Message currMessage;
 
             public ClientHandler(Socket socket) {
@@ -114,18 +114,15 @@ public class Server {
 
                     oos = new ObjectOutputStream(socket.getOutputStream());
                     ois = new ObjectInputStream(socket.getInputStream());
-                    oos.writeObject(clients);
-                    oos.flush();
+                    //oos.writeObject(clients);
+                    //oos.flush();
+                    specificUser = (User) ois.readObject();
+                    clients.put(specificUser, socket); //FIXA DENNA
 
                     //Test
                     Message testMessage = new Message("test to receive", new ImageIcon());
                     oos.writeObject(testMessage);
 
-                    Object obj = ois.readObject();
-                    if (obj instanceof User) {
-                        senderUser = (User) obj;
-                        System.out.println("Server: User connected to server");
-                    }
 
                     Message currMessage;
                     //syfte läs in meddelande objekt och skicka det till user om
@@ -170,7 +167,7 @@ public class Server {
     }
 
     public static void main(String[] args) {
-        Server server = new Server(5555);
+        Server server = new Server(5556);
         server.startConnection();
     }
 }

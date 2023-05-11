@@ -1,2 +1,2 @@
-Hej
-avatars/1.jpeg
+l
+avatars/0.png

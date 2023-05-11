@@ -72,7 +72,7 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
         //ip = InetAddress.getByName(localHost);
         System.out.println("Client: created");
         try {
-            socket = new Socket("127.0.0.1", 5555);
+            socket = new Socket("127.0.0.1", 5556);
             System.out.println("Client: connected");
             oos = new ObjectOutputStream(socket.getOutputStream());
             ois = new ObjectInputStream(socket.getInputStream());
@@ -84,9 +84,11 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
 
         receiveMessage();
         receiveMessageThread.start();
+        //sendMessage();
+        //sendMessageThread().start();
     }
 
-    /*
+
     public void sendMessage() {
         //sendMessageThread = new Thread(this);
         sendMessageThread = new Thread(new Runnable() {
@@ -102,7 +104,7 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
                 }
             }
         });
-    }*/
+    }
 
     /*
     public void userSendsMessage(String[] str, User receiver) throws IOException {
@@ -123,6 +125,7 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
             public void run() {
                 try {
                     System.out.println("Client: receiveMessage loop is active");
+                    oos.writeObject(user);
                     boolean success = true;
                     /*while (success) {
                         System.out.println("Client: INside while loop");
