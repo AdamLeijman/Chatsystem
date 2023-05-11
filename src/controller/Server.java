@@ -117,7 +117,9 @@ public class Server {
                     //oos.writeObject(clients);
                     //oos.flush();
                     specificUser = (User) ois.readObject();
-                    clients.put(specificUser, socket); //FIXA DENNA
+                    Client client = new Client();
+                    client.setSocket(socket);
+                    clients.put(specificUser, client); //FIXA DENNA
 
                     //Test
                     Message testMessage = new Message("test to receive", new ImageIcon());

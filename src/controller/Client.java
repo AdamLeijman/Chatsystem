@@ -182,6 +182,14 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
     }
     */
 
+    public Socket getSocket() {
+        return socket;
+    }
+
+    public void setSocket(Socket socket) {
+        this.socket = socket;
+    }
+
     //Syftet med addToContacts är att få in en user, hämta alla nuvarande kontakter från textfilen för att inte
     // skriva över nuvarande kontakter och addera summan till textfilen
     public void addToContacts(User newContact) {
