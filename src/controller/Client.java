@@ -25,6 +25,7 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
     private User user;
     private Message message;
     private Controller controller;
+    private Message currMessage = null;
 
     public Client() {
         selectUserInfo();
@@ -82,23 +83,29 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
             e.printStackTrace();
         }
 
-        receiveMessage();
-        receiveMessageThread.start();
+        sendMessage();
+        sendMessageThread.start();
         //sendMessage();
         //sendMessageThread().start();
     }
 
 
+
     public void sendMessage() {
-        //sendMessageThread = new Thread(this);
         sendMessageThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    System.out.println("Client: sendMessage loop is active");
+                    System.out.println("Client: receiveMessage loop is active");
                     oos.writeObject(user);
-                    oos.flush();
-                    //userSendsMessage();
+
+                    while (true) {
+                        if (currMessage!=null){
+                            oos.writeObject(currMessage);
+                            currMessage=null;
+                            System.out.println("Client: Message-object sent");
+                        }
+                    }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -125,28 +132,9 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
             public void run() {
                 try {
                     System.out.println("Client: receiveMessage loop is active");
-                    oos.writeObject(user);
-                    boolean success = true;
-                    /*while (success) {
-                        System.out.println("Client: INside while loop");
-                        if (ois.readObject() instanceof Clients) {
-                            Clients clients = (Clients) ois.readObject();
-                            clients.put(user, Client.this);
-                            success = false;
-                        }
-                    }*/
-                    //lägg till i client och user clients object
-
                     while (true) {
                         Object obj = ois.readObject();
                         System.out.println("Client: object received");
-
-                        if (obj instanceof Clients) {
-                            Clients clients = (Clients) obj;
-                            //clients.put(user, Client.this);
-                        }
-                        System.out.println("R");
-
                         if (obj instanceof Message) {
                             Message message = (Message) obj;
                             message.setTimeReceived(LocalDateTime.now());
@@ -166,9 +154,7 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
         return user.getUsername();
     }
 
-    public void chooseReceiver(User user) {
-        message.setReceiver(user);
-    }
+
 
     public void closeConnection() throws IOException {
         socket.close();
@@ -216,4 +202,7 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
         }
     }
 
+    public void setCurrMessage(Message currMessage) {
+        this.currMessage = currMessage;
+    }
 }

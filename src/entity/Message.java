@@ -9,13 +9,14 @@ import java.util.ArrayList;
 public class Message implements Serializable {
     private String text;
     private ImageIcon image;
-    private ArrayList<User> receivers = new ArrayList<>();
+    private ArrayList<String> receivers;
     private LocalDateTime timeSent;
     private LocalDateTime timeReceived;
 
-    public Message(String text, ImageIcon image) {
+    public Message(String sender, ArrayList<String> receivers, String text, ImageIcon image) {
         this.text = text;
         this.image = image;
+        this.receivers=receivers;
     }
 
     //Syftet med denna konstruktorn är att användare ska kunna skapa messageobjekt utan bilder, dvs textmeddelande
@@ -25,11 +26,11 @@ public class Message implements Serializable {
     //Syftet med denna konstruktorn är att användare ska kunna skapa messageobjekt utan text, dvs bildmeddelande
     public Message(ImageIcon image){this.image = image;}
 
-    public ArrayList<User> getReceivers() {
+    public ArrayList<String> getReceivers() {
         return receivers;
     }
 
-    public void setReceiver(User receiver) {
+    public void setReceiver(String receiver) {
         receivers.add(receiver);
     }
 
@@ -60,4 +61,7 @@ public class Message implements Serializable {
     public void setTimeReceived(LocalDateTime timeReceived) {
         this.timeReceived = timeReceived;
     }
+
+
+
 }

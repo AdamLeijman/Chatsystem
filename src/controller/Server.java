@@ -100,46 +100,40 @@ public class Server {
             private ObjectInputStream ois;
             private Socket socket;
             private User specificUser;
-            //private Message currMessage;
 
             public ClientHandler(Socket socket) {
                 this.socket = socket;
                 System.out.println("Client has been assigned a ClientHandler (ch)");
             }
 
+            public User getUser(String str){
+                for (User u : connectedUsers){
+                    if (u.getUsername()==str){
+                        return u;
+                    }
+                }
+                return null;
+            }
+
             @Override
             public void run() {
                 try {
-                    System.out.println("Server: RUNNNINGGGGGGG");
-
                     oos = new ObjectOutputStream(socket.getOutputStream());
                     ois = new ObjectInputStream(socket.getInputStream());
-                    //oos.writeObject(clients);
-                    //oos.flush();
+
                     specificUser = (User) ois.readObject();
-                    clients.put(specificUser, socket); //FIXA DENNA
-                    System.out.println("User connected to server and added to clients");
-                    //Test
-                    Message testMessage = new Message("test to receive", new ImageIcon());
-                    oos.writeObject(testMessage);
+                    clients.put(specificUser, socket);
 
-
-                    Message currMessage;
-                    //syfte läs in meddelande objekt och skicka det till user om
-                    //hen är online annars lagra messageobjektet i unsendmessages-klassen
-                    while(true){
-                        currMessage = (Message) ois.readObject();
+                    while(!socket.isClosed()){
+                        Message currMessage = (Message) ois.readObject();
                         if (currMessage!=null) {
-                        //obj = ois.readObject();
-                        //currMessage = (Message) obj;
-                        //currMessage = (Message) ois.readObject();
-                        System.out.println("hej");
-                        logTraffic(currMessage);
-                        ArrayList<User> receivers = currMessage.getReceivers();
-                        System.out.println("hej2" + currMessage.getReceivers());
-                        for (User currReceiverUser : receivers) {
+                            logTraffic(currMessage);
+                            ArrayList<String> receivers = currMessage.getReceivers();
+                            System.out.println("hej2" + currMessage.getReceivers());
+                        for (String receiver : receivers) {
                             System.out.println("hej3 connectedUsers.size()" + connectedUsers.size());
-                            if (connectedUsers.size() == 0) {
+                            User user = getUser(receiver);
+                            if (user==null) {
                                 unsendMessages.put(currReceiverUser, currMessage);
                                 System.out.println("Server: receiver offline, Message stored");
                             } else {

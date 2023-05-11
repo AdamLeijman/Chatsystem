@@ -2,9 +2,11 @@ package boundary;
 
 import controller.Client;
 import controller.Controller;
+import entity.Message;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 public class MainFrame {
     private Controller controller;
@@ -46,10 +48,12 @@ public class MainFrame {
         frame.add(pnlContacts, BorderLayout.EAST);
     }
 
-    public void updateConversation(String user, String currentReceiver, String recentMessage, Icon recentImage){
-        user = client.getUsername();
-        System.out.println(user + currentReceiver + recentMessage + recentImage);
-        pnlChat.updateCenterPanel(user, currentReceiver, recentMessage, recentImage);
+    public void updateConversation(ArrayList<String> receivers, String recentMessage, Icon recentImage){
+        String sender = client.getUsername();
+
+        pnlChat.updateCenterPanel(sender, receivers.get(0), recentMessage, recentImage);
+        Message newMessage = new Message(sender, receivers, recentMessage, (ImageIcon) recentImage);
+        client.setCurrMessage(newMessage);
     }
 
 }

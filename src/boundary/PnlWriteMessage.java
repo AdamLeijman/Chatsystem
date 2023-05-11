@@ -5,6 +5,7 @@ import controller.Controller;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.util.ArrayList;
 
 public class PnlWriteMessage extends JPanel {
    private MainFrame mainFrame;
@@ -45,6 +46,9 @@ public class PnlWriteMessage extends JPanel {
     }
 
     public void updateConversation(Boolean imageAndText)  {
+        ArrayList<String> receivers = new ArrayList<>();
+        receivers.add("john"); //TEST
+
         String currTextMessage = "";
         if (imageAndText) {
             ImageIcon image = null;
@@ -59,14 +63,14 @@ public class PnlWriteMessage extends JPanel {
                     lblIcon.setIcon(ii);
                     Icon icon = new ImageIcon(f.getPath());
                     currTextMessage = write.getText();
-                    mainFrame.updateConversation("south", "south", currTextMessage, icon);
+                    mainFrame.updateConversation(receivers, currTextMessage, icon);
                     write.setText("");
                 }
             } catch (Exception e) {
             }
         } else {
             currTextMessage = write.getText();
-            mainFrame.updateConversation("south", "south", currTextMessage, null);
+            mainFrame.updateConversation(receivers, currTextMessage, null);
             write.setText("");
         }
     }
