@@ -143,7 +143,7 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
 
                         if (obj instanceof Clients) {
                             Clients clients = (Clients) obj;
-                            clients.put(user, Client.this);
+                            //clients.put(user, Client.this);
                         }
                         System.out.println("R");
 

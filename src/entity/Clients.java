@@ -3,13 +3,14 @@ package entity;
 import controller.Client;
 
 import java.io.Serializable;
+import java.net.Socket;
 import java.util.HashMap;
 
-public class Clients implements Serializable {
-    private HashMap<User, Client> clients = new HashMap<User, Client>();
+public class Clients {
+    private HashMap<User, Socket> clients = new HashMap<User, Socket>();
     // egna tillägg
-    public synchronized void put(User user,Client client) {
-        clients.put(user,client);
+    public synchronized void put(User user, Socket socket) {
+        clients.put(user, socket);
     }
     public synchronized Client get(User user) {
         return get(user);
