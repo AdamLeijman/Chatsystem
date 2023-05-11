@@ -7,16 +7,18 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class Message implements Serializable {
+    private String sender;
+    private ArrayList<String> receivers;
     private String text;
     private ImageIcon image;
-    private ArrayList<String> receivers;
     private LocalDateTime timeSent;
     private LocalDateTime timeReceived;
 
     public Message(String sender, ArrayList<String> receivers, String text, ImageIcon image) {
+        this.sender = sender;
+        this.receivers = receivers;
         this.text = text;
         this.image = image;
-        this.receivers=receivers;
     }
 
     //Syftet med denna konstruktorn är att användare ska kunna skapa messageobjekt utan bilder, dvs textmeddelande

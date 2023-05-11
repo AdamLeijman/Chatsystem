@@ -1,6 +1,7 @@
-package entity;
+package controller;
 
 import controller.Client;
+import entity.User;
 
 import java.io.Serializable;
 import java.net.Socket;
@@ -12,8 +13,9 @@ public class Clients {
     public synchronized void put(User user, Socket socket) {
         clients.put(user, socket);
     }
-    public synchronized Client get(User user) {
-        return get(user);
+    public synchronized Socket get(User user) {
+        return clients.get(user);
+
     }
 
     public synchronized void remove(User user, Client client){

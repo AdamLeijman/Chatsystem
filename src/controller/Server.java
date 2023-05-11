@@ -12,6 +12,7 @@ import java.util.*;
 
 public class Server {
     private ArrayList<User> connectedUsers = new ArrayList<>();
+    private ArrayList<User> totalUsers = new ArrayList<>();
     private Clients clients;
     private ServerUI serverUI;
     private UnsendMessages unsendMessages;
@@ -107,12 +108,21 @@ public class Server {
             }
 
             public User getUser(String str){
-                for (User u : connectedUsers){
-                    if (u.getUsername()==str){
+                for (User u : totalUsers){
+                    if (Objects.equals(u.getUsername(), str)){
                         return u;
                     }
                 }
-                return null;
+                return new User("john", new ImageIcon());
+            }
+
+            public boolean isOnline(User usr){
+                for (User u : connectedUsers){
+                    if (Objects.equals(u.getUsername(), usr.getUsername())){
+                        return true;
+                    }
+                }
+                return false;
             }
 
             @Override
@@ -123,39 +133,37 @@ public class Server {
 
                     specificUser = (User) ois.readObject();
                     clients.put(specificUser, socket);
+                    totalUsers.add(specificUser);
+                    connectedUsers.add(specificUser);
 
                     while(!socket.isClosed()){
                         Message currMessage = (Message) ois.readObject();
                         if (currMessage!=null) {
                             logTraffic(currMessage);
+                            sendMessage();
                             ArrayList<String> receivers = currMessage.getReceivers();
-                            System.out.println("hej2" + currMessage.getReceivers());
-                        for (String receiver : receivers) {
-                            System.out.println("hej3 connectedUsers.size()" + connectedUsers.size());
-                            User user = getUser(receiver);
-                            if (user==null) {
-                                unsendMessages.put(currReceiverUser, currMessage);
-                                System.out.println("Server: receiver offline, Message stored");
+                        for (String str : receivers) {
+                            System.out.println(str);
+                            User receiver = getUser(str);
+                            if(isOnline(receiver)){
+                                System.out.println("hej4 connectedUsers.size()" + connectedUsers.size());
+                                Socket receiverSocket = clients.get(receiver);
+                                ObjectOutputStream oos2 = new ObjectOutputStream(receiverSocket.getOutputStream());
+                                oos2.writeObject(currMessage);
                             } else {
-                                for (int i = 0; i < connectedUsers.size(); i++) {
-                                    if (currReceiverUser == connectedUsers.get(i)) {
-                                        System.out.println("Server: receiver online, Message sent");
-                                        Client currReceiverClient = clients.get(currReceiverUser);
-                                        currReceiverClient.receiveMessage();
-                                    } else {
-                                        if (i == connectedUsers.size() - 1) {
-                                            unsendMessages.put(currReceiverUser, currMessage);
-                                        }
-                                    }
-                                }
+                                unsendMessages.put(receiver, currMessage);
+                                System.out.println("Server: receiver offline, Message stored");
                             }
                         }
-                        //System.out.println("HEJ");
                     }
                     }
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
+            }
+
+            private void sendMessage() {
+                sadasd
             }
         }
     }

@@ -85,8 +85,8 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
 
         sendMessage();
         sendMessageThread.start();
-        //sendMessage();
-        //sendMessageThread().start();
+        receiveMessage();
+        receiveMessageThread.start();
     }
 
 
@@ -100,10 +100,15 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
                     oos.writeObject(user);
 
                     while (true) {
+
+                        ArrayList<String> temp = new ArrayList<>();//CREATES FAKE A MESSAGE
+                        temp.add("john");
+                        currMessage = new Message("JOJO", temp, "text", null);
+                        currMessage.setTimeSent(LocalDateTime.now());
+
                         if (currMessage!=null){
                             oos.writeObject(currMessage);
                             currMessage=null;
-                            System.out.println("Client: Message-object sent");
                         }
                     }
                 } catch (IOException e) {
@@ -134,15 +139,17 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
                     System.out.println("Client: receiveMessage loop is active");
                     while (true) {
                         Object obj = ois.readObject();
-                        System.out.println("Client: object received");
                         if (obj instanceof Message) {
                             Message message = (Message) obj;
                             message.setTimeReceived(LocalDateTime.now());
+                            System.out.println("MESSAGE RECEIVED-------------------------");
                             //TODO skicka till ui:t!
                             //Här mottags ett meddelande, men lyckas inte få upp det i GUIt
                             //controller.testUpdateGUI(message.getText(), "From user");
                         }
-                    }
+
+
+                        }
                 } catch (IOException | ClassNotFoundException e) {
                     throw new RuntimeException(e);
                 }
