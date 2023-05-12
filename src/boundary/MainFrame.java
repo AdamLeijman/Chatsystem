@@ -1,21 +1,20 @@
 package boundary;
 
 import controller.Client;
-import controller.Controller;
+import entity.User;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 public class MainFrame {
-    private Controller controller;
     private JFrame frame;
     private Client client;
     private PnlWriteMessage pnlWriteMessage;
     private PnlChat pnlChat;
     private PnlContacts pnlContacts;
 
-    public MainFrame(Controller controller, Client client) {
-        this.controller = controller;
+    public MainFrame(Client client, String name) {
         this.client = client;
 
         frame = new JFrame();
@@ -23,7 +22,7 @@ public class MainFrame {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         BorderLayout layout = new BorderLayout();
         frame.setLayout(layout);
-        frame.setTitle("Chat application");
+        frame.setTitle("Chat application " + name);
 
         InitializeGUI();					// Fill in components
 
@@ -47,9 +46,18 @@ public class MainFrame {
     }
 
     public void updateConversation(String user, String currentReceiver, String recentMessage, Icon recentImage){
-        user = client.getUsername();
-        System.out.println(user + currentReceiver + recentMessage + recentImage);
         pnlChat.updateCenterPanel(user, currentReceiver, recentMessage, recentImage);
     }
 
+    public void sendMessage(String recentMessage, Icon icon){
+        client.newMessage(recentMessage, icon);
+    }
+
+    public void showOnline(ArrayList<User> connectedUsersAR) {
+        pnlContacts.setConnectedUsers(connectedUsersAR);
+    }
+
+    public void exit() {
+        frame.dispose();
+    }
 }

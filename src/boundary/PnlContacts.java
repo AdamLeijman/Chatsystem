@@ -1,7 +1,10 @@
 package boundary;
 
+import entity.User;
+
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 public class PnlContacts extends JPanel {
     private JPanel pnlView;
@@ -42,22 +45,10 @@ public class PnlContacts extends JPanel {
         add(pnlView);
     }
 
-    public JList<Object> getConnectedUsers() {
-        return connectedUsers;
+    public void setConnectedUsers(ArrayList<User> connUsers) {
+        Object[] listData = connUsers.toArray();
+        connectedUsers.setListData(listData);
     }
-
-    public void setConnectedUsers(Object[] connUsers) {
-        connectedUsers.setListData(connUsers);
-    }
-
-    public JList<Object> getContacts() {
-        return contacts;
-    }
-
-    public void setContacts(JList<Object> contacts) {
-        this.contacts = contacts;
-    }
-
 
 
 }

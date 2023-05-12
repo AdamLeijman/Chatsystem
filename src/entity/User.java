@@ -31,4 +31,10 @@ public class User implements Serializable { // Även användas i strömmar
             return username.equals(((User) obj).getUsername());
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "User: " + username +
+                ", image=" + image;
+    }
 }

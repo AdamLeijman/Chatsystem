@@ -1,37 +1,25 @@
 package controller;
 
+import boundary.MainFrame;
 import entity.*;
-
-import javax.security.auth.callback.Callback;
 import javax.swing.*;
 import java.io.*;
 import java.net.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
-public class Client extends Thread implements Runnable, Callback, Serializable {
-    private final int port = 5555;
+public class Client extends Thread implements Runnable {
     private ObjectOutputStream oos;
     private ObjectInputStream ois;
-    private InetAddress ip;
-
-    private Socket socket;
-    private Thread sendMessageThread;
     private Thread receiveMessageThread;
+    private ArrayList<User> connectedUsersAR = new ArrayList<>();
+    private MainFrame view;
     private User user;
-    private Message message;
-    private Controller controller;
 
-    public Client() {
-        selectUserInfo();
+    public Client(String name) {
+        user = new User(name, new ImageIcon("avatars/1.jpeg"));
+        view= new MainFrame( this, name);
+        //selectUserInfo();
         newClient();
-        //ui.addListener((control.Callback) this);
-        controller = new Controller(this);
-        message = new Message("testMessage");
     }
 
     public void selectUserInfo() {
@@ -39,7 +27,6 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
             /*BufferedReader bf = new BufferedReader(new FileReader("files/ExistingUser.txt"));
             String existingUser = bf.readLine();
             ImageIcon existingAvatar = new ImageIcon(bf.readLine());
-
              */
             String existingUser = null;
             ImageIcon existingAvatar = null;
@@ -69,121 +56,49 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
     }
 
     public void newClient() {
-        //ip = InetAddress.getByName(localHost);
         System.out.println("Client: created");
         try {
-            socket = new Socket("127.0.0.1", 5555);
+            int port = 1441;
+            Socket socket = new Socket("127.0.0.1", port);
             System.out.println("Client: connected");
-            oos = new ObjectOutputStream(socket.getOutputStream());
-            ois = new ObjectInputStream(socket.getInputStream());
+            this.oos = new ObjectOutputStream(socket.getOutputStream());
+            this.ois = new ObjectInputStream(socket.getInputStream());
 
-            //TODO Check for unsent messages!
+            receiveMessage();
+            receiveMessageThread.start();
+
+            oos.writeObject(user);
+            oos.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        receiveMessage();
-        receiveMessageThread.start();
     }
-
-    /*
-    public void sendMessage() {
-        //sendMessageThread = new Thread(this);
-        sendMessageThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    System.out.println("Client: sendMessage loop is active");
-                    oos.writeObject(user);
-                    oos.flush();
-                    //userSendsMessage();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-    }*/
-
-    /*
-    public void userSendsMessage(String[] str, User receiver) throws IOException {
-
-        Message message = new Message(str[0], new ImageIcon("images/gubbe.jpg"));
-        message.setReceiver(receiver);
-        System.out.println("Client: userSendsMessage!");
-        message.setTimeSent(LocalDateTime.now());
-        oos.writeObject(message);
-        oos.flush();
-        message.clearReceivers();
-        //message = new Message("new Message");
-    }*/
 
     public void receiveMessage() {
-        receiveMessageThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    System.out.println("Client: receiveMessage loop is active");
-                    boolean success = true;
-                    /*while (success) {
-                        System.out.println("Client: INside while loop");
-                        if (ois.readObject() instanceof Clients) {
-                            Clients clients = (Clients) ois.readObject();
-                            clients.put(user, Client.this);
-                            success = false;
-                        }
-                    }*/
-                    //lägg till i client och user clients object
+        receiveMessageThread = new Thread(() -> {
+            try {
+                while (true) {
+                    Object obj = ois.readObject();
 
-                    while (true) {
-                        Object obj = ois.readObject();
-                        System.out.println("Client: object received");
-
-                        if (obj instanceof Clients) {
-                            Clients clients = (Clients) obj;
-                            clients.put(user, Client.this);
-                        }
-                        System.out.println("R");
-
-                        if (obj instanceof Message) {
-                            Message message = (Message) obj;
-                            message.setTimeReceived(LocalDateTime.now());
-                            //TODO skicka till ui:t!
-                            //Här mottags ett meddelande, men lyckas inte få upp det i GUIt
-                            //controller.testUpdateGUI(message.getText(), "From user");
-                        }
+                    if (obj instanceof Message m) {
+                        view.updateConversation(m.getSender().getUsername(), user.getUsername(), m.getText(), m.getImage());
                     }
-                } catch (IOException | ClassNotFoundException e) {
-                    throw new RuntimeException(e);
+                    else if (obj instanceof ArrayList<?>) {
+                            connectedUsersAR = (ArrayList<User>) obj;
+                            view.showOnline(connectedUsersAR);
+                    }
                 }
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
             }
         });
     }
 
-    public String getUsername() {
-        return user.getUsername();
-    }
 
-    public void chooseReceiver(User user) {
-        message.setReceiver(user);
-    }
 
-    public void closeConnection() throws IOException {
-        socket.close();
-    }
-
-   /* public void showConnectedUsers() {
-        ArrayList<User> connUsers = new ArrayList<>();
-        Server s = new Server(8888);
-        connUsers = s.getConnectedUsers();
-        //TODO skicka till ui:t! Fixa så den hämtar från servern och skapar en ny!
-    }
-    */
-
-    //Syftet med addToContacts är att få in en user, hämta alla nuvarande kontakter från textfilen för att inte
-    // skriva över nuvarande kontakter och addera summan till textfilen
     public void addToContacts(User newContact) {
-        BufferedReader bf = null;
-        ArrayList<String> tempList = new ArrayList<String>();
+        BufferedReader bf;
+        ArrayList<String> tempList = new ArrayList<>();
         try {
             bf = new BufferedReader(new FileReader("files/Contacts.txt"));
             String line = bf.readLine();
@@ -195,14 +110,22 @@ public class Client extends Thread implements Runnable, Callback, Serializable {
             throw new RuntimeException(e);
         }
         try (BufferedWriter out = new BufferedWriter(new FileWriter("files/Contacts.txt"))) {
-            for (int i = 0; i < tempList.size(); i++) {
-                out.write(tempList.get(i) + "\n");
+            for (String s : tempList) {
+                out.write(s + "\n");
             }
             out.write(newContact.getUsername());
-            out.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+    public void newMessage(String recentMessage, Icon icon) {
+        Message messageToAll = new Message(user, connectedUsersAR, recentMessage, (ImageIcon) icon);
+        try {
+            oos.writeObject(messageToAll);
+            oos.flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
