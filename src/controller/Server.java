@@ -10,7 +10,7 @@ import java.util.*;
 public class Server extends Thread {
     private final int port;
     private ArrayList<User> disconnectedUsers = new ArrayList<>();
-    private HashMap<User, ClientThread> clients1 = new HashMap<>();
+    private Clients newClients = new Clients();
 
 
     public Server(int port) {
@@ -57,12 +57,15 @@ public class Server extends Thread {
         private HashMap<User, ClientThread> clients = new HashMap<>();
         private ArrayList<User> connectedUsers = new ArrayList<>();
 
-        public synchronized void put(User user, Server.ClientThread client) {
+        public synchronized void put(User user, ClientThread client) {
             clients.put(user, client);
         }
 
-        public synchronized Server.ClientThread get(User user) {
+        public synchronized ClientThread get(User user) {
             return clients.get(user);
+        }
+        public synchronized ClientThread remove(User user) {
+            return clients.remove(user);
         }
 
         public synchronized ArrayList<User> activeUsers() {
@@ -101,7 +104,7 @@ public class Server extends Thread {
 
                 Object obj = is.readObject();
                 user = (User) obj;
-                clients1.put(user, this);
+                newClients.put(user, this);
 
                 writer = new Writer();
                 reader = new Reader(writer);
@@ -124,6 +127,7 @@ public class Server extends Thread {
 
             public Reader(Writer writer) {
                 this.writer=writer;
+                new Thread(writer).start();
 
                 check4();
             }
@@ -131,26 +135,26 @@ public class Server extends Thread {
             private void check4() {
                 try {
                     while (isRunning) {
-                        writer.updateConnections();
+                        //writer.updateConnections();
 
-                      //  if(is.available()>0) {
+                        //if(is.available()>0) {
                             Object obj = is.readObject();
                             if (obj instanceof Message m) {
                                 writer.sendCurrMessage(m);
                             }
                             if (obj instanceof String s) {
-                                if(s=="close") {
+                                if(s.equals("close")) {
                                     isRunning = false;
                                 }
                             }
-                       // }
+                        //}
                     }
                 } catch (IOException | ClassNotFoundException e) {
                     throw new RuntimeException(e);
                 } finally {
                     try {
+                        newClients.remove(user);
                         clientSocket.close();
-                        clients1.remove(user);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -158,22 +162,38 @@ public class Server extends Thread {
             }
         }
 
-        private class Writer {
+        private class Writer implements Runnable {
+            @Override
+            public void run() {
+                while(true){
+                    try {
+                        updateConnections();
+                        sleep(500);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+
             public void updateConnections() throws IOException {
                 User[] uList = new User[100];
                 int count= 0;
-                for (User u : clients1.keySet()) {
+                for (User u : newClients.getClients().keySet()) {
                     /*
                     for (User connU: disconnectedUsers){
                         if(connU.getUsername()!=u.getUsername()){
                             uList[count++] = u;
                         }
                     }*/
-                    uList[count++] = u;
+                    //if(!Objects.equals(u.getUsername(), user.getUsername())) {
+                        uList[count++] = u;
+                    //}
                 }
 
 
-                Iterator cIterator = clients1.entrySet().iterator();
+                Iterator cIterator = newClients.getClients().entrySet().iterator();
                 while(cIterator.hasNext()){
                     Map.Entry mapElement = (Map.Entry)cIterator.next();
                     //System.out.println("HashMap after adding bonus marks:" + mapElement.getValue());
@@ -183,13 +203,13 @@ public class Server extends Thread {
             }
 
             public void sendCurrMessage(Message m) throws IOException {
-                for (User u : clients1.keySet()) {
+                for (User u : newClients.getClients().keySet()) {
                         if (Objects.equals(u.getUsername(), m.getReceivers()[0].getUsername())) {
-                            clients1.get(u).os.writeObject(m);
+                            newClients.getClients().get(u).os.writeObject(m);
                         }
                 }
-                clients1.get(user).os.writeObject(m); //skickartill sig själv
-                clients1.get(user).os.flush();
+                newClients.getClients().get(user).os.writeObject(m); //skickartill sig själv
+                newClients.getClients().get(user).os.flush();
 
 
             }

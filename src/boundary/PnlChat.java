@@ -29,7 +29,7 @@ public class PnlChat extends JPanel {
         add(grid);
     }
 
-    public void updateCenterPanel(String user, String currentReceiver, String recentMessage, Icon recentImage){
+    public void updateCenterPanel(String user, String currentReceivers, String recentMessage, Icon recentImage){
         currConversation.add(user + " - " + recentMessage);
         if (recentImage!=null) {
             currConversation.add(recentImage);

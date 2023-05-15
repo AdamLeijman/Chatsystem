@@ -7,20 +7,21 @@ import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 
 public class Client {
     private ObjectOutputStream oos;
     private ObjectInputStream ois;
     private Thread receiveMessageThread;
-    private ArrayList<User> connectedUsersAR = new ArrayList<>();
     private MainFrame view;
     private User user;
     private Socket socket;
     private User[] onlineUsers;
     private int[] currIndexes = null;
-    private User[] receivers;
+    private User[] outMsgreceivers;
     User[] contacts = new User[100];
     private boolean running = true;
+    private User[] inMsgReceivers;
 
     public Client(String name) {
         user = new User(name, new ImageIcon("avatars/1.jpeg"));
@@ -82,11 +83,21 @@ public class Client {
                    
 
                     if (obj instanceof Message m) {
-                        view.updateConversation(m.getSender().getUsername(), user.getUsername(), m.getText(), m.getImage());
+                        StringBuilder names = new StringBuilder();
+                        for (User u : m.getReceivers()) {
+                                names.append(u.getUsername());
+                        }
+                        names.append(m.getSender().getUsername());
+
+                        inMsgReceivers = m.getReceivers();
+
+                        view.updateConversation(m.getSender().getUsername(), String.valueOf(names), m.getText(), m.getImage());
                     }
                     else if (obj instanceof User[] uList) {
-                        onlineUsers = uList;
-                        view.showOnline(uList);
+                        if(view.getReceivers().length<1) {
+                            onlineUsers = uList;
+                            view.showOnline(uList);
+                        }
                     }
                 }
             } catch (IOException | ClassNotFoundException e) {
@@ -140,8 +151,9 @@ public class Client {
         return tempList;
     }
 
+
     public void newMessage(String recentMessage, Icon icon) {
-        if(receivers==null && view.getReceivers().length<1) {
+        if(outMsgreceivers ==null && view.getReceivers().length<1) {
             JOptionPane.showMessageDialog(null, "SELECT RECEIVER!");
         } else {
 
@@ -150,17 +162,31 @@ public class Client {
                 if (currIndexes != view.getReceivers()) {
                     currIndexes = view.getReceivers();
                 }
-                receivers = new User[currIndexes.length];
+                outMsgreceivers = new User[currIndexes.length];
                 int count = 0;
                 StringBuilder names = new StringBuilder();
                 for (int index : currIndexes) {
-                    receivers[count++] = onlineUsers[index];
+                    outMsgreceivers[count++] = onlineUsers[index];
                     names.append(onlineUsers[index].getUsername());
                 }
-                view.updateChattingWithTitle(String.valueOf(names));
+
+                if(inMsgReceivers!=null) {
+                    boolean newChat = true;
+                    for (int i = 0; i < outMsgreceivers.length; i++) {
+                        for (int j = 0; j < inMsgReceivers.length; j++) {
+                            if (Objects.equals(outMsgreceivers[i].getUsername(), inMsgReceivers[j].getUsername())) {
+                                newChat = false;
+                            }
+                        }
+                    }
+                    if (newChat) {
+                        view.updateChattingWithTitle(String.valueOf(names));
+                        view.resetChatWindow();
+                    }
+                }
             }
 
-            Message messageToAll = new Message(user, receivers, recentMessage, (ImageIcon) icon);
+            Message messageToAll = new Message(user, outMsgreceivers, recentMessage, (ImageIcon) icon);
             try {
                 oos.writeObject(messageToAll);
                 oos.flush();

@@ -47,8 +47,8 @@ public class MainFrame {
         frame.add(pnlContacts, BorderLayout.EAST);
     }
 
-    public void updateConversation(String user, String currentReceiver, String recentMessage, Icon recentImage){
-        pnlChat.updateCenterPanel(user, currentReceiver, recentMessage, recentImage);
+    public void updateConversation(String user, String currentReceivers, String recentMessage, Icon recentImage){
+        pnlChat.updateCenterPanel(user, currentReceivers, recentMessage, recentImage);
     }
 
     public void sendMessage(String recentMessage, Icon icon){
@@ -71,6 +71,9 @@ public class MainFrame {
 
     public void updateChattingWithTitle(String receivers) {
         frame.setTitle("Chat application " + name + " Chatting with: " + receivers);
+    }
+
+    public void resetChatWindow(){
         pnlChat.resetChat();
     }
 
