@@ -25,6 +25,8 @@ public class PnlWriteMessage extends JPanel {
         write.setPreferredSize(new Dimension(400, 20));
         JButton exit = new JButton("Exit");
 
+        add.addActionListener(l -> mainFrame.addContact());
+
         send.addActionListener(l -> updateConversation(false));
 
         image.addActionListener(l -> updateConversation(true));

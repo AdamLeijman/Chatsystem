@@ -8,8 +8,9 @@ import java.util.ArrayList;
 
 public class PnlChat extends JPanel {
     private final ArrayList<Object> currConversation = new ArrayList<>();
-    private final JList<Object> jlistConversation = new JList<>();
+    private JList<Object> jlistConversation = new JList<>();
     private MainFrame mainFrame;
+    private Object[] listData;
 
     public PnlChat(MainFrame mainFrame) {
         this.mainFrame=mainFrame;
@@ -33,9 +34,13 @@ public class PnlChat extends JPanel {
         if (recentImage!=null) {
             currConversation.add(recentImage);
         }
-        Object[] listData = currConversation.toArray();
+        listData = currConversation.toArray();
         jlistConversation.setListData(listData);
     }
 
-
+    public void resetChat() {
+        currConversation.clear();
+        listData = currConversation.toArray();
+        jlistConversation.setListData(listData);
+    }
 }

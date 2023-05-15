@@ -9,6 +9,9 @@ import java.util.*;
 
 public class Server extends Thread {
     private final int port;
+    private ArrayList<User> disconnectedUsers = new ArrayList<>();
+    private HashMap<User, ClientThread> clients1 = new HashMap<>();
+
 
     public Server(int port) {
         this.port=port;
@@ -39,58 +42,162 @@ public class Server extends Thread {
         try {
             ServerSocket serverSocket = new ServerSocket(port);
             System.out.println("Server: skapad");
-            Clients clients = new Clients();
             while (true) {
                 Socket socket = serverSocket.accept();
-                ClientThread ch = new ClientThread(socket, clients);
-                Thread thread = new Thread(ch);
-                thread.start();
+                ClientThread ch = new ClientThread(socket);
+                new Thread(ch).start();
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-}
 
-class ClientThread extends Thread {
-    public ObjectInputStream is = null;
-    public ObjectOutputStream os = null;
-    private final Socket clientSocket;
-    private final Clients clientsC;
 
-    public ClientThread(Socket clientSocket, Clients clientsC) {
-        this.clientSocket = clientSocket;
-        this.clientsC = clientsC;
+    public class Clients {
+        private HashMap<User, ClientThread> clients = new HashMap<>();
+        private ArrayList<User> connectedUsers = new ArrayList<>();
+
+        public synchronized void put(User user, Server.ClientThread client) {
+            clients.put(user, client);
+        }
+
+        public synchronized Server.ClientThread get(User user) {
+            return clients.get(user);
+        }
+
+        public synchronized ArrayList<User> activeUsers() {
+            return connectedUsers;
+        }
+
+        public synchronized void addActiveUser(User user) {
+            connectedUsers.add(user);
+            System.out.println("client " + user);
+        }
+
+        public synchronized void removeActiveUsers(User user) {
+            connectedUsers.remove(user);
+        }
+
+        public synchronized HashMap<User, ClientThread> getClients() {
+            return clients;
+        }
     }
-    public void run() {
-        try {
-            this.is = new ObjectInputStream(clientSocket.getInputStream());
-            this.os = new ObjectOutputStream(clientSocket.getOutputStream());
 
-            User user = (User) this.is.readObject();
-            clientsC.put(user, this);
-            clientsC.addActiveUser(user);
+    public class ClientThread implements Runnable {
+        public ObjectInputStream is = null;
+        public ObjectOutputStream os = null;
+        private Socket clientSocket;
+        private User user;
+        private Reader reader;
+        private Writer writer;
 
-            while(!clientSocket.isClosed()){
-                HashMap<User, ClientThread> map = clientsC.getClients();
+        private ClientThread(Socket clientSocket) {
+            this.clientSocket = clientSocket;
+        }
+        public void run() {
+            try {
+                this.os = new ObjectOutputStream(clientSocket.getOutputStream());
+                this.is = new ObjectInputStream(clientSocket.getInputStream());
+
                 Object obj = is.readObject();
-                if (obj instanceof Message m) {
-                    for (User key : map.keySet()) {
-                        map.get(key).os.writeObject(m);
-                        map.get(key).os.flush();
-                        clientsC.get(key).os.writeObject(clientsC.activeUsers());
-                        clientsC.get(key).os.flush();
+                user = (User) obj;
+                clients1.put(user, this);
+
+                writer = new Writer();
+                reader = new Reader(writer);
+                System.out.println("Connection Est");
+
+            } catch (IOException e) {
+                //System.out.println("User Session terminated");
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public ObjectOutputStream getOs() {
+            return os;
+        }
+
+        private class Reader{
+            private Writer writer;
+            boolean isRunning =  true;
+
+            public Reader(Writer writer) {
+                this.writer=writer;
+
+                check4();
+            }
+
+            private void check4() {
+                try {
+                    while (isRunning) {
+                        writer.updateConnections();
+
+                      //  if(is.available()>0) {
+                            Object obj = is.readObject();
+                            if (obj instanceof Message m) {
+                                writer.sendCurrMessage(m);
+                            }
+                            if (obj instanceof String s) {
+                                if(s=="close") {
+                                    isRunning = false;
+                                }
+                            }
+                       // }
+                    }
+                } catch (IOException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                } finally {
+                    try {
+                        clientSocket.close();
+                        clients1.remove(user);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
                     }
                 }
             }
-            clientsC.removeActiveUsers(user);
-
-        } catch (IOException e) {
-            System.out.println("User Session terminated");
-        } catch (ClassNotFoundException e) {
-            System.out.println("Class Not Found");
         }
-    }
+
+        private class Writer {
+            public void updateConnections() throws IOException {
+                User[] uList = new User[100];
+                int count= 0;
+                for (User u : clients1.keySet()) {
+                    /*
+                    for (User connU: disconnectedUsers){
+                        if(connU.getUsername()!=u.getUsername()){
+                            uList[count++] = u;
+                        }
+                    }*/
+                    uList[count++] = u;
+                }
+
+
+                Iterator cIterator = clients1.entrySet().iterator();
+                while(cIterator.hasNext()){
+                    Map.Entry mapElement = (Map.Entry)cIterator.next();
+                    //System.out.println("HashMap after adding bonus marks:" + mapElement.getValue());
+                    ClientThread ch = (ClientThread) mapElement.getValue();
+                    ch.getOs().writeObject(uList);
+                }
+            }
+
+            public void sendCurrMessage(Message m) throws IOException {
+                for (User u : clients1.keySet()) {
+                        if (Objects.equals(u.getUsername(), m.getReceivers()[0].getUsername())) {
+                            clients1.get(u).os.writeObject(m);
+                        }
+                }
+                clients1.get(user).os.writeObject(m); //skickartill sig själv
+                clients1.get(user).os.flush();
+
+
+            }
+            }
+
+        }
+
+
 }
 
 

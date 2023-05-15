@@ -2,7 +2,6 @@ package entity;
 
 import javax.swing.*;
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -12,7 +11,8 @@ public class Message implements Serializable {
     private LocalDateTime timeSent;
     private LocalDateTime timeReceived;
     private User sender;
-    private ArrayList<User> receivers = new ArrayList<>();
+    private ArrayList<User> activeUsers = new ArrayList<>();
+    private User[] receivers;
 
     public Message(String text, ImageIcon image) {
         this.text = text;
@@ -26,9 +26,9 @@ public class Message implements Serializable {
     //Syftet med denna konstruktorn är att användare ska kunna skapa messageobjekt utan text, dvs bildmeddelande
     public Message(ImageIcon image){this.image = image;}
 
-    public Message(User user, ArrayList<User> connectedUsers, String testText, ImageIcon imageIcon) {
+    public Message(User user, User[] receivers, String testText, ImageIcon imageIcon) {
         sender=user;
-        receivers=connectedUsers;
+        this.receivers=receivers;
         text = testText;
         image = imageIcon;
     }
@@ -44,13 +44,7 @@ public class Message implements Serializable {
     }
 
 
-    public ArrayList<User> getReceivers() {
-        return receivers;
-    }
 
-    public void setReceivers(ArrayList<User> receivers) {
-        this.receivers = receivers;
-    }
 
     public String getText() {
         return text;
@@ -84,5 +78,18 @@ public class Message implements Serializable {
                 ", sender=" + sender +
                 ", receivers=" + receivers +
                 '}';
+    }
+
+    public ArrayList<User> getActiveUsers() {
+        return activeUsers;
+    }
+
+
+    public User[] getReceivers() {
+        return receivers;
+    }
+
+    public void setReceivers(User[] receivers) {
+        this.receivers = receivers;
     }
 }

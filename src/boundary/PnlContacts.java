@@ -45,10 +45,18 @@ public class PnlContacts extends JPanel {
         add(pnlView);
     }
 
-    public void setConnectedUsers(ArrayList<User> connUsers) {
-        Object[] listData = connUsers.toArray();
+    public void setConnectedUsers(User[] connUsers) {
+        Object[] listData = connUsers;
         connectedUsers.setListData(listData);
     }
 
 
+    public int[] getReceivers() {
+        return connectedUsers.getSelectedIndices();
+    }
+
+    public void updateContacts(ArrayList<String> contactUsers){
+        Object[] listData = contactUsers.toArray();
+        contacts.setListData(listData);
+    }
 }

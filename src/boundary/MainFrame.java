@@ -13,9 +13,11 @@ public class MainFrame {
     private PnlWriteMessage pnlWriteMessage;
     private PnlChat pnlChat;
     private PnlContacts pnlContacts;
+    private String name;
 
     public MainFrame(Client client, String name) {
         this.client = client;
+        this.name=name;
 
         frame = new JFrame();
         frame.setBounds(0, 0, 1000, 526);
@@ -53,11 +55,30 @@ public class MainFrame {
         client.newMessage(recentMessage, icon);
     }
 
-    public void showOnline(ArrayList<User> connectedUsersAR) {
+    public void showOnline(User[] connectedUsersAR) {
         pnlContacts.setConnectedUsers(connectedUsersAR);
     }
 
     public void exit() {
         frame.dispose();
+        client.disconnect();
+    }
+
+    public int[] getReceivers() {
+        return pnlContacts.getReceivers();
+    }
+
+
+    public void updateChattingWithTitle(String receivers) {
+        frame.setTitle("Chat application " + name + " Chatting with: " + receivers);
+        pnlChat.resetChat();
+    }
+
+    public void addContact() {
+        client.addToContacts(pnlContacts.getReceivers());
+    }
+
+    public void updateContacts(ArrayList<String> values) {
+        pnlContacts.updateContacts(values);
     }
 }
