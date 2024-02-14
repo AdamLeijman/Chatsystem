@@ -5,6 +5,8 @@ import controller.Client;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -96,11 +98,28 @@ public class ChatApplicationGUI extends JFrame {
         textInputField.setText("Type your message here"); // Clear the text input field
     }
 
-    public void incomingMessage(String sender, String text, ImageIcon image) {
+    public void incomingMessage(String sender, String text, ImageIcon image, LocalDateTime timeSent, LocalDateTime timeReceived) {
         setConversationalist(sender);
-        chatTextArea.append(sender + " to you: " + text + "\n");
+
+        // Create Font object with a smaller size
+        Font smallFont = chatTextArea.getFont().deriveFont(Font.PLAIN, 10);
+
+        // Format time sent and time received
+        String formattedTimeSent = timeSent.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        String formattedTimeReceived = timeReceived.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+
+        // Set the font for the time
+        chatTextArea.setFont(smallFont);
+
+        // Append the message with formatted time
+        chatTextArea.append(sender + " to you: " + text + " (Sent: " + formattedTimeSent + ", Received: " + formattedTimeReceived + ")\n");
+
+        // Reset the font back to its original size
+        chatTextArea.setFont(chatTextArea.getFont().deriveFont(Font.PLAIN, 12));
+
         System.out.println("GUI: incomingMessage()");
     }
+
 
     public void setOnline(JList<String> userNames) {
         connectedUsersList.setModel(userNames.getModel());  // Update the model of the JList

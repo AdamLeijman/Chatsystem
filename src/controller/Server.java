@@ -5,6 +5,7 @@ import entity.*;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class Server extends Thread {
@@ -93,6 +94,7 @@ public class Server extends Thread {
                     while (isRunning) {
                             Object obj = is.readObject();
                             if (obj instanceof Message m) {
+                                m.setTimeReceived(LocalDateTime.now());
                                 writer.sendCurrMessage(m);
                             }
                             if (obj instanceof String s) {

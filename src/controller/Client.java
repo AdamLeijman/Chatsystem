@@ -5,6 +5,7 @@ import entity.*;
 import javax.swing.*;
 import java.io.*;
 import java.net.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -61,7 +62,10 @@ public class Client {
 
                         //currChatPartner = m.getReceivers();
 
-                        view.incomingMessage(m.getSender().getUsername(), m.getText(), m.getImage());
+                        m.setTimeSent(LocalDateTime.now());
+
+                        view.incomingMessage(m.getSender().getUsername(),
+                                m.getText(), m.getImage(), m.getTimeSent(), m.getTimeReceived());
                     }
                     /*else if (obj instanceof User[] uList) {
                         //if(view.getReceivers().length<1) {

@@ -8,8 +8,8 @@ import java.util.ArrayList;
 public class Message implements Serializable {
     private String text;
     private ImageIcon image;
-    private LocalDateTime timeSent;
-    private LocalDateTime timeReceived;
+    private LocalDateTime timeSent = null;
+    private LocalDateTime timeReceived = null;
     private User sender;
     private ArrayList<User> activeUsers = new ArrayList<>();
     private User[] receivers;
@@ -37,4 +37,19 @@ public class Message implements Serializable {
         return receivers;
     }
 
+    public LocalDateTime getTimeSent() {
+        return timeSent;
+    }
+
+    public LocalDateTime getTimeReceived() {
+        return timeReceived;
+    }
+
+    public void setTimeSent(LocalDateTime timeSent) {
+        this.timeSent = timeSent;
+    }
+
+    public void setTimeReceived(LocalDateTime timeReceived) {
+        this.timeReceived = timeReceived;
+    }
 }
