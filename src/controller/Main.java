@@ -4,6 +4,9 @@ public class Main {
 
 
     public static void main(String[] args) {
+        //OBS! JAG HAR LADDAT UPP ETT DOKUMENT BASERAT PÅ RAPPORTMALLEN
+        //https://docs.google.com/document/d/1ult885RAV0reZsTqXJDE6Oa735izRSVT/edit?usp=sharing&ouid=115394361315385912023&rtpof=true&sd=true
+
         Server server = new Server(1441);
         server.start();
 
