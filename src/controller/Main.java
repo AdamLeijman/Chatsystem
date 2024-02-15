@@ -19,11 +19,12 @@ public class Main {
         new Client("John", 1);
         new Client("Josephine", 2);
 
+        /*
         try {
             Thread.sleep(6000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        new Client("Ewa", 3);
+        new Client("Ewa", 3);*/
     }
 }

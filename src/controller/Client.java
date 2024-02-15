@@ -23,11 +23,12 @@ public class Client {
     private User[] currChatPartner;
     private String name;
     private final int port = 1441;
+    private String myAvatar = "avatars/1.jpeg";
 
     public Client(String name, int off) {
         this.name =name;
-        user = new User(name, new ImageIcon("avatars/1.jpeg"));
-        view = new ChatApplicationGUI(this, off);
+        user = new User(name, null);
+        view = new ChatApplicationGUI(this, off, myAvatar);
 
 
         try {
@@ -64,6 +65,8 @@ public class Client {
 
                         m.setTimeSent(LocalDateTime.now());
 
+                        System.out.println("HEY"+ m.getImage());
+
                         view.incomingMessage(m.getSender().getUsername(),
                                 m.getText(), m.getImage(), m.getTimeSent(), m.getTimeReceived());
                     }
@@ -88,7 +91,7 @@ public class Client {
         receiveMessageThread.start();
     }
 
-    public void newMessage(String sTo[], String text, Icon icon) {
+    public void newMessage(String sTo[], String text, ImageIcon icon) {
 
         User me = findUserByUsername(onlineUsers, name);
         User[] sendTo = new User[sTo.length];
@@ -96,9 +99,11 @@ public class Client {
             sendTo[i] = findUserByUsername(onlineUsers, sTo[i]);
         }
 
+        Message message = new Message(me, sendTo, text, icon);
+        System.out.println(message.getImage());
         //Message messageToAll = new Message(user, currChatPartner, recentMessage, (ImageIcon) icon);
         try {
-            oos.writeObject(new Message(me, sendTo, text, (ImageIcon) icon));
+            oos.writeObject(message);
             oos.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -135,6 +140,28 @@ public class Client {
     public String getName() {
         return name;
     }
+
+    public void shutDown() {
+        try {
+            if (socket != null && !socket.isClosed()) {
+                // Close ObjectOutputStream first to ensure proper closure
+                if (oos != null) {
+                    oos.close();
+                }
+
+                // Close ObjectInputStream
+                if (ois != null) {
+                    ois.close();
+                }
+
+                // Close the socket
+                socket.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace(); // Handle the exception according to your needs
+        }
+    }
+
 }
 
 

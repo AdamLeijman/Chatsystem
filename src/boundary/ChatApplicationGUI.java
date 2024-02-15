@@ -4,6 +4,7 @@ import controller.Client;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -17,13 +18,16 @@ public class ChatApplicationGUI extends JFrame {
     private final Client client;
     private String conversationalist;
     private JPanel chatPanel;
+    private final String myAvatar;
+    private String imagePath;
 
-    public ChatApplicationGUI(Client client, int off) {
+    public ChatApplicationGUI(Client client, int off, String myAvatar) {
+        this.myAvatar = myAvatar;
         this.client=client;
         // Set up the main frame
         setTitle(client.getName());
         setSize(600, 400);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         int xOffset = 600 * off;
         int yOffset = 300 * off;
@@ -32,7 +36,9 @@ public class ChatApplicationGUI extends JFrame {
         // Create components
         chatTextArea = new JTextArea();
         textInputField = new JTextField();
-        JButton sendButton = new JButton("Send");
+//        JButton sendButton = new JButton("Send");
+//        JButton uploadButton = new JButton("Upload Image");
+//        JButton exitButton = new JButton("Exit");
         connectedUsersList = new JList<>(new String[]{"User1", "User2", "User3"}); // Replace with actual user data
         connectedUsersList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
@@ -44,11 +50,40 @@ public class ChatApplicationGUI extends JFrame {
         add(createInputPanel(), BorderLayout.SOUTH);
 
         // Add action listener for the Send button
-        sendButton.addActionListener(e -> sendMessage());
+//        uploadButton.addActionListener(e -> uploadImage());
+//        sendButton.addActionListener(e -> sendMessage());
 
         setVisible(true);
     }
 
+    private void uploadImage() {
+        // Create a file chooser
+        JFileChooser fileChooser = new JFileChooser();
+
+        // Set the file filter to restrict to certain file types (optional)
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Image Files", "jpg", "jpeg", "png", "gif");
+        fileChooser.setFileFilter(filter);
+
+        // Show the file chooser dialog
+        int result = fileChooser.showOpenDialog(this);  // "this" refers to the parent component, like a JFrame
+
+        // Check if the user selected a file
+        if (result == JFileChooser.APPROVE_OPTION) {
+            // Get the selected file
+            java.io.File selectedFile = fileChooser.getSelectedFile();
+
+            // Now you can do something with the selected file, such as getting its path
+            String filePath = selectedFile.getAbsolutePath();
+            System.out.println("Selected file: " + filePath);
+            imagePath = filePath;
+
+            // Perform further operations as needed
+            // For example, you might want to display the selected image or upload it to a server
+        } else {
+            // User canceled the file selection
+            System.out.println("File selection canceled");
+        }
+    }
     private JPanel createChatPanel() {
         chatPanel = new JPanel(new BorderLayout());
         TitledBorder titledBorder = BorderFactory.createTitledBorder("Chat Area");
@@ -74,10 +109,31 @@ public class ChatApplicationGUI extends JFrame {
 
     private JPanel createSendButtonPanel() {
         JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+
         JButton sendButton = new JButton("Send");
+        JButton uploadButton = new JButton("Upload Image");
+        JButton exitButton = new JButton("Exit");
+
+        //HEre file path = myAvatar
+        ImageIcon icon = new ImageIcon(myAvatar);
+        icon.setImage(icon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH));
+
+        JLabel label = new JLabel(icon);
+        buttonPanel.add(label);
+
+
         buttonPanel.add(sendButton);
+        buttonPanel.add(uploadButton);
+        buttonPanel.add(exitButton);
         // Add action listener for the Send button
         sendButton.addActionListener(e -> sendMessage());
+        uploadButton.addActionListener(e2 -> uploadImage());
+        /*exitButton.addActionListener(e3 -> {
+            // Get the top-level container (JFrame) of the buttonPanel
+            SwingUtilities.getWindowAncestor(buttonPanel).dispose();
+            client.shutDown();
+        });*/
         return buttonPanel;
     }
 
@@ -89,12 +145,13 @@ public class ChatApplicationGUI extends JFrame {
         if (sendTo.length > 0 && !message.isEmpty()) {
             setConversationalist(sendTo[sendTo.length-1]);
             chatTextArea.append("You to " + Arrays.toString(sendTo) + ": " + message + "\n");
-            client.newMessage(sendTo, message, null);
+            client.newMessage(sendTo, message, new ImageIcon(imagePath));
             resetTextField();
         }
     }
 
     private void resetTextField() {
+        imagePath = null;
         textInputField.setText("Type your message here"); // Clear the text input field
     }
 
@@ -113,6 +170,10 @@ public class ChatApplicationGUI extends JFrame {
 
         // Append the message with formatted time
         chatTextArea.append(sender + " to you: " + text + " (Sent: " + formattedTimeSent + ", Received: " + formattedTimeReceived + ")\n");
+
+        if (image != null) {
+            //CONTINUE HERE DISPLAY IMAGE
+        }
 
         // Reset the font back to its original size
         chatTextArea.setFont(chatTextArea.getFont().deriveFont(Font.PLAIN, 12));
