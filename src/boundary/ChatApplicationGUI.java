@@ -8,11 +8,13 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
 public class ChatApplicationGUI extends JFrame {
-    private final JTextArea chatTextArea;
+    private final JList<Object> chatTextArea;
+    private final ArrayList<Object> currConv = new ArrayList<>();
     private final JTextField textInputField;
     private final JList<String> connectedUsersList;
     private final Client client;
@@ -34,7 +36,8 @@ public class ChatApplicationGUI extends JFrame {
         setLocation(xOffset, yOffset);
 
         // Create components
-        chatTextArea = new JTextArea();
+        chatTextArea = new JList<>();
+       // chatTextArea.setEditable(false);
         textInputField = new JTextField();
 //        JButton sendButton = new JButton("Send");
 //        JButton uploadButton = new JButton("Upload Image");
@@ -144,14 +147,21 @@ public class ChatApplicationGUI extends JFrame {
 
         if (sendTo.length > 0 && !message.isEmpty()) {
             setConversationalist(sendTo[sendTo.length-1]);
-            chatTextArea.append("You to " + Arrays.toString(sendTo) + ": " + message + "\n");
+            currConv.add("You to " + Arrays.toString(sendTo) + ": " + message + "\n");
+            if (imagePath != null) {
+                String messageWithTime = ("You to " + Arrays.toString(sendTo) + ": " + message);
+                currConv.add(messageWithTime);
+                // Append HTML formatted message with image
+                currConv.add(new ImageIcon(imagePath));
+            }
+            chatTextArea.setListData(currConv.toArray());
             client.newMessage(sendTo, message, new ImageIcon(imagePath));
             resetTextField();
         }
     }
 
     private void resetTextField() {
-        imagePath = null;
+        //imagePath = null;
         textInputField.setText("Type your message here"); // Clear the text input field
     }
 
@@ -169,11 +179,16 @@ public class ChatApplicationGUI extends JFrame {
         chatTextArea.setFont(smallFont);
 
         // Append the message with formatted time
-        chatTextArea.append(sender + " to you: " + text + " (Sent: " + formattedTimeSent + ", Received: " + formattedTimeReceived + ")\n");
+        currConv.add(sender + " to you: " + text + " (Sent: " + formattedTimeSent + ", Received: " + formattedTimeReceived + ")\n");
+
 
         if (image != null) {
-            //CONTINUE HERE DISPLAY IMAGE
+            String messageWithTime = sender + " to you: " + text + " (Sent: " + formattedTimeSent + ", Received: " + formattedTimeReceived + ")";
+            currConv.add(messageWithTime);
+            // Append HTML formatted message with image
+            currConv.add(image);
         }
+        chatTextArea.setListData(currConv.toArray());
 
         // Reset the font back to its original size
         chatTextArea.setFont(chatTextArea.getFont().deriveFont(Font.PLAIN, 12));
