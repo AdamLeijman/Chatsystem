@@ -1,5 +1,6 @@
 package controller;
 
+import boundary.ServerUI;
 import entity.*;
 
 import java.io.*;
@@ -12,6 +13,7 @@ public class Server extends Thread {
     private final int port;
     private Clients newClients = new Clients();
     private final UnsendMessages unsendMessages = new UnsendMessages();
+    private final ServerUI serverUI = new ServerUI(this);
 
     public Server(int port) {
         this.port = port;
@@ -105,7 +107,7 @@ public class Server extends Thread {
                         if (obj instanceof Message m) {
                             LocalDateTime date = LocalDateTime.now();
                             m.setTimeReceived(date);
-                            writeToU
+                            serverUI.addInfo(date, m.getTimeSent());
                             writer.sendCurrMessage(m);
                         }
 

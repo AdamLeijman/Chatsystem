@@ -3,6 +3,7 @@ package boundary;
 import controller.Server;
 import javax.swing.*;
 import java.awt.*;
+import java.time.LocalDateTime;
 
 public class ServerUI {
 
@@ -41,7 +42,7 @@ public class ServerUI {
         frame.setVisible(true);
     }
 
-    public void addInfo(Object[] obj){
+    public void addInfo(LocalDateTime received, LocalDateTime sent){
         info.setListData(obj);
     }
 
