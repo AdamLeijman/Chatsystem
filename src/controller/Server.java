@@ -69,10 +69,8 @@ public class Server extends Thread {
                 user = (User) obj;
                 newClients.put(user, this);
 
-
-
                 writer = new Writer();
-                checkUnsentMessages();
+
 
                 reader = new Reader(writer);
                 System.out.println("Connection Est");
@@ -82,23 +80,6 @@ public class Server extends Thread {
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
-        }
-        private void checkUnsentMessages() throws IOException {
-
-            /*
-            if (arrayList != null) {
-                System.out.println("AAAAA");
-                for (Message m : arrayList) {
-                    for (User user : m.getReceivers()) {
-                        for (User u : newClients.getClients().keySet()) {
-                            if (u.getUsername() == "Null"+user.getUsername()) {
-                                os.writeObject(m);
-                                os.flush();
-                            }
-                        }
-                    }
-                }*/
-
         }
 
         public synchronized ObjectOutputStream getOs() {
@@ -117,18 +98,15 @@ public class Server extends Thread {
             }
 
             private synchronized void reading() {
-
-
                 try {
                     while (isRunning) {
-
-                        checkUnsentMessages();
 
                         Object obj = is.readObject();
                         if (obj instanceof Message m) {
                             m.setTimeReceived(LocalDateTime.now());
                             writer.sendCurrMessage(m);
                         }
+
                         if (obj instanceof String s) {
                             if (s.equals("close")) {
                                 isRunning = false;
@@ -146,21 +124,6 @@ public class Server extends Thread {
                     }
                 }
             }
-
-            private void checkUnsentMessages() throws IOException {
-                    ArrayList<Message> arrayList = unsendMessages.get(user);
-                    if(arrayList!=null){
-                        unsendMessages.clear();
-                        for (Message m : arrayList) {
-                            getOs().writeObject(m);
-                            getOs().flush();
-                            //writer.sendCurrMessage(m);
-                        }
-                    }
-
-            }
-
-
         }
 
         private class Writer implements Runnable {
@@ -169,11 +132,21 @@ public class Server extends Thread {
                 while (true) {
                     try {
                         updateConnections();
+                        checkUnsentMessages();
                         sleep(5000);
-                    } catch (IOException e) {
+                    } catch (IOException | InterruptedException e) {
                         throw new RuntimeException(e);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
+                    }
+                }
+            }
+
+            private synchronized void checkUnsentMessages() throws IOException {
+                ArrayList<Message> arrayList = unsendMessages.get(user);
+                if (arrayList != null) {
+                    unsendMessages.clear();
+                    for (Message m : arrayList) {
+                        getOs().writeObject(m);
+                        getOs().flush();
                     }
                 }
             }
