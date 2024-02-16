@@ -47,6 +47,10 @@ public class Message implements Serializable {
         return receivers;
     }
 
+    public void setReceivers(User[] receivers) {
+        this.receivers = receivers;
+    }
+
     public LocalDateTime getTimeSent() {
         return timeSent;
     }

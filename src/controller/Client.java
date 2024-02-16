@@ -6,10 +6,7 @@ import javax.swing.*;
 import java.io.*;
 import java.net.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 
 public class Client {
@@ -117,7 +114,7 @@ public class Client {
             }
         }
 
-        return null;  // Return null if no match is found
+        return new User("Null" + targetUsername, null);  // Return null if no match is found
     }
 
 
@@ -162,6 +159,47 @@ public class Client {
         }
     }
 
+    public void addContact(String[] newContacts) {
+        try {
+            // Read existing contacts from the file
+            Set<String> existingContacts = readExistingContacts();
+
+            // Append new contacts, avoiding duplicates
+            for (String contact : newContacts) {
+                if (!existingContacts.contains(contact)) {
+                    existingContacts.add(contact);
+                }
+            }
+
+            // Write the updated contacts back to the file
+            writeContactsToFile(existingContacts);
+
+        } catch (IOException e) {
+            e.printStackTrace(); // Handle the exception according to your application's needs
+        }
+    }
+
+    public Set<String> readExistingContacts() throws IOException {
+        Set<String> existingContacts = new HashSet<>();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader("files/contacts.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                existingContacts.add(line);
+            }
+        }
+
+        return existingContacts;
+    }
+
+    private void writeContactsToFile(Set<String> contacts) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("files/contacts.txt"))) {
+            for (String contact : contacts) {
+                writer.write(contact);
+                writer.newLine();
+            }
+        }
+    }
 }
 
 

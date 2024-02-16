@@ -8,11 +8,12 @@ public class UnsendMessages {
     // egna tillägg
     public synchronized void put(User user, Message message) {
         // hämta ArrayList – om null skapa en och placera i unsend
-        System.out.println(message.getText() + "AAA" + message.getReceivers());
+        System.out.println("UnsendMessages: put() meddelande har lagrats");
 
         //map.get("vishal")
         if (unsentMap.get(user)==null){
             ArrayList<Message> messageArrayList = new ArrayList<>();
+            messageArrayList.add(message);
             unsentMap.put(user, messageArrayList);
             System.out.println("UnsendMessages: message " + message.getText() + " added to NEW unsentMap");
         } else {
@@ -23,13 +24,29 @@ public class UnsendMessages {
     }
 
     public synchronized ArrayList<Message> get(User user) {
-        // Returnera en kopia av ArrayList för att förhindra oavsiktlig ändring av listan
-        ArrayList<Message> messages = unsentMap.get(user);
-        if(messages == null){
-            return new ArrayList<>(messages);
-        } else{
-            return new ArrayList<>();
+        String temp = "Null" + user.getUsername();
+
+        for (Map.Entry<User, ArrayList<Message>> entry : unsentMap.entrySet()) {
+            User usr = entry.getKey();
+            if (usr.getUsername().equals(temp)) {
+                System.out.println("Match found for user: " + user.getUsername());
+
+
+                return entry.getValue();
+            }
         }
+
+            return null;
+
+
+        // Returnera en kopia av ArrayList för att förhindra oavsiktlig ändring av listan
+
+        //ArrayList<Message> messages = unsentMap.get(user);
+        //if(messages == null){
+          //  return new ArrayList<>(messages);
+        //} else{
+          //  return new ArrayList<>();
+        //}
     }
 
     public synchronized void clear(){

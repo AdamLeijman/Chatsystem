@@ -6,17 +6,20 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Set;
 
 public class ChatApplicationGUI extends JFrame {
     private final JList<Object> chatTextArea;
     private final ArrayList<Object> currConv = new ArrayList<>();
     private final JTextField textInputField;
     private final JList<String> connectedUsersList;
+    private JList<String> contactsList = new JList<>(new DefaultListModel<>());
     private final Client client;
     private String conversationalist;
     private JPanel chatPanel;
@@ -44,6 +47,8 @@ public class ChatApplicationGUI extends JFrame {
 //        JButton exitButton = new JButton("Exit");
         connectedUsersList = new JList<>(new String[]{"User1", "User2", "User3"}); // Replace with actual user data
         connectedUsersList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        contactsList = new JList<>(new String[]{"Cont1", "User2", "User3"}); // Replace with actual user data
+        contactsList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
         // Set layouts
         setLayout(new BorderLayout());
@@ -51,6 +56,7 @@ public class ChatApplicationGUI extends JFrame {
         // Add components to the frame
         add(createChatPanel(), BorderLayout.CENTER);
         add(createInputPanel(), BorderLayout.SOUTH);
+        add(createContactsPanel(), BorderLayout.EAST);
 
         // Add action listener for the Send button
 //        uploadButton.addActionListener(e -> uploadImage());
@@ -104,6 +110,10 @@ public class ChatApplicationGUI extends JFrame {
         JScrollPane jsp = new JScrollPane(connectedUsersList);
         jsp.setPreferredSize(new Dimension(150, 150)); // Adjust the width as needed
         inputPanel.add(jsp, BorderLayout.WEST);
+
+        JScrollPane jspContacts = new JScrollPane(contactsList);
+        jsp.setPreferredSize(new Dimension(150, 150)); // Adjust the width as needed
+        inputPanel.add(jspContacts, BorderLayout.EAST);
 
         inputPanel.add(createSendButtonPanel(), BorderLayout.EAST);
         resetTextField();
@@ -187,14 +197,6 @@ public class ChatApplicationGUI extends JFrame {
     }
 
 
-/*    private Image rescaleMethod(ImageIcon imageIcon) {
-        Image image = imageIcon.getImage();
-        // Scale the image to maximum size of 50x50
-        return image.getScaledInstance(imageIcon.getIconWidth()/2, imageIcon.getIconHeight()/2, Image.SCALE_SMOOTH);
-    }
-
- */
-
     private void resetTextField() {
         //imagePath = null;
         textInputField.setText("Type your message here"); // Clear the text input field
@@ -238,8 +240,31 @@ public class ChatApplicationGUI extends JFrame {
         System.out.println("GUI: setOnline()");
     }
 
+    public void setContacts() throws IOException {
+        Set<String> existingContacts = client.readExistingContacts();
+        DefaultListModel<String> listModel = new DefaultListModel<>();
+
+        for (String contact : existingContacts) {
+            listModel.addElement(contact);
+        }
+
+        contactsList.setModel(listModel);  // Update the model of the JList
+        contactsList.repaint();  // Refresh the display
+        System.out.println("GUI: setContacts()");
+    }
+
+
     public String[] getSelectedUsers() {
-        return connectedUsersList.getSelectedValuesList().toArray(new String[0]);
+        ArrayList<String> selectedUsersList = new ArrayList<>();
+
+        // Add selected users from connectedUsersList
+        selectedUsersList.addAll(connectedUsersList.getSelectedValuesList());
+
+        // Add selected users from contactsList
+        selectedUsersList.addAll(contactsList.getSelectedValuesList());
+
+        // Convert the List to an array of Strings
+        return selectedUsersList.toArray(new String[0]);
     }
 
     public void setConversationalist(String str) {
@@ -250,6 +275,59 @@ public class ChatApplicationGUI extends JFrame {
             chatPanel.repaint(); // Ensure the changes are reflected
             conversationalist = str;
         }
+    }
+
+    private void addContact() {
+        String[] sendTo = getSelectedUsers();
+        client.addContact(sendTo);
+
+
+        // Get the existing data from the JList
+        ListModel<String> listModel = contactsList.getModel();
+        DefaultListModel<String> defaultListModel;
+
+        // Check if the current model is a DefaultListModel
+        if (listModel instanceof DefaultListModel) {
+            defaultListModel = (DefaultListModel<String>) listModel;
+        } else {
+            // If not, create a new DefaultListModel and copy existing data
+            defaultListModel = new DefaultListModel<>();
+            for (int i = 0; i < listModel.getSize(); i++) {
+                defaultListModel.addElement(listModel.getElementAt(i));
+            }
+        }
+
+        // Add each user to the list without duplicates
+        for (String user : sendTo) {
+            if (!defaultListModel.contains(user)) {
+                defaultListModel.addElement(user);
+            }
+        }
+
+        // Set the model to the JList
+        contactsList.setModel(defaultListModel);
+    }
+
+    private JPanel createContactsPanel() {
+        JPanel contactsPanel = new JPanel(new BorderLayout());
+        TitledBorder titledBorder = BorderFactory.createTitledBorder("Contacts");
+        contactsPanel.setBorder(titledBorder);
+
+
+
+        JScrollPane contactsScrollPane = new JScrollPane(contactsList);
+        contactsPanel.add(contactsScrollPane, BorderLayout.CENTER);
+
+        JButton addToContactsButton = new JButton("Add to Contacts");
+        addToContactsButton.addActionListener(e -> addContact());
+        contactsPanel.add(addToContactsButton, BorderLayout.SOUTH);
+        try {
+            setContacts();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return contactsPanel;
     }
 
 }

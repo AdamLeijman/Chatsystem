@@ -11,9 +11,10 @@ import java.util.*;
 public class Server extends Thread {
     private final int port;
     private Clients newClients = new Clients();
+    private final UnsendMessages unsendMessages = new UnsendMessages();
 
     public Server(int port) {
-        this.port=port;
+        this.port = port;
     }
 
     public void run() {
@@ -32,12 +33,15 @@ public class Server extends Thread {
 
     public class Clients {
         private HashMap<User, ClientThread> clients = new HashMap<>();
+
         public synchronized void put(User user, ClientThread client) {
             clients.put(user, client);
         }
+
         public synchronized ClientThread remove(User user) {
             return clients.remove(user);
         }
+
         public synchronized HashMap<User, ClientThread> getClients() {
             return clients;
         }
@@ -55,6 +59,7 @@ public class Server extends Thread {
         private ClientThread(Socket clientSocket) {
             this.clientSocket = clientSocket;
         }
+
         public void run() {
             try {
                 this.os = new ObjectOutputStream(clientSocket.getOutputStream());
@@ -64,7 +69,11 @@ public class Server extends Thread {
                 user = (User) obj;
                 newClients.put(user, this);
 
+
+
                 writer = new Writer();
+                checkUnsentMessages();
+
                 reader = new Reader(writer);
                 System.out.println("Connection Est");
 
@@ -74,34 +83,57 @@ public class Server extends Thread {
                 throw new RuntimeException(e);
             }
         }
+        private void checkUnsentMessages() throws IOException {
 
-        public ObjectOutputStream getOs() {
+            /*
+            if (arrayList != null) {
+                System.out.println("AAAAA");
+                for (Message m : arrayList) {
+                    for (User user : m.getReceivers()) {
+                        for (User u : newClients.getClients().keySet()) {
+                            if (u.getUsername() == "Null"+user.getUsername()) {
+                                os.writeObject(m);
+                                os.flush();
+                            }
+                        }
+                    }
+                }*/
+
+        }
+
+        public synchronized ObjectOutputStream getOs() {
             return os;
         }
 
-        private class Reader{
+        private class Reader {
             private Writer writer;
-            boolean isRunning =  true;
+            boolean isRunning = true;
 
             public Reader(Writer writer) {
-                this.writer=writer;
+                this.writer = writer;
+
                 new Thread(writer).start();
                 reading();
             }
 
-            private void reading() {
+            private synchronized void reading() {
+
+
                 try {
                     while (isRunning) {
-                            Object obj = is.readObject();
-                            if (obj instanceof Message m) {
-                                m.setTimeReceived(LocalDateTime.now());
-                                writer.sendCurrMessage(m);
+
+                        checkUnsentMessages();
+
+                        Object obj = is.readObject();
+                        if (obj instanceof Message m) {
+                            m.setTimeReceived(LocalDateTime.now());
+                            writer.sendCurrMessage(m);
+                        }
+                        if (obj instanceof String s) {
+                            if (s.equals("close")) {
+                                isRunning = false;
                             }
-                            if (obj instanceof String s) {
-                                if(s.equals("close")) {
-                                    isRunning = false;
-                                }
-                            }
+                        }
                     }
                 } catch (IOException | ClassNotFoundException e) {
                     throw new RuntimeException(e);
@@ -114,12 +146,27 @@ public class Server extends Thread {
                     }
                 }
             }
+
+            private void checkUnsentMessages() throws IOException {
+                    ArrayList<Message> arrayList = unsendMessages.get(user);
+                    if(arrayList!=null){
+                        unsendMessages.clear();
+                        for (Message m : arrayList) {
+                            getOs().writeObject(m);
+                            getOs().flush();
+                            //writer.sendCurrMessage(m);
+                        }
+                    }
+
+            }
+
+
         }
 
         private class Writer implements Runnable {
             @Override
             public void run() {
-                while(true){
+                while (true) {
                     try {
                         updateConnections();
                         sleep(5000);
@@ -140,7 +187,7 @@ public class Server extends Thread {
                     uList[count++] = u;
                 }
 
-                if(connectedUsers==null || !areArraysEqual(connectedUsers, uList)) {
+                if (connectedUsers == null || !areArraysEqual(connectedUsers, uList)) {
 
                     Iterator cIterator = newClients.getClients().entrySet().iterator();
                     while (cIterator.hasNext()) {
@@ -155,16 +202,20 @@ public class Server extends Thread {
 
             public void sendCurrMessage(Message m) throws IOException {
                 for (User user : m.getReceivers()) {
-                    for (User u : newClients.getClients().keySet()) {
-                        if (Objects.equals(u.getUsername(), user.getUsername())) {
-                            newClients.getClients().get(u).os.writeObject(m);
+                    if (user.getUsername().startsWith("Null")) {
+                        unsendMessages.put(user, m);
+                    } else {
+                        for (User u : newClients.getClients().keySet()) {
+                            if (Objects.equals(u.getUsername(), user.getUsername())) {
+                                newClients.getClients().get(u).os.writeObject(m);
+                            }
                         }
+                        newClients.getClients().get(user).os.flush();
                     }
-                    newClients.getClients().get(user).os.flush();
                 }
             }
 
-            }
+        }
 
 
         public boolean areArraysEqual(User[] array1, User[] array2) {
