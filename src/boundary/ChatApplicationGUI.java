@@ -5,6 +5,7 @@ import controller.Client;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.*;
 import java.awt.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -12,7 +13,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class ChatApplicationGUI extends JFrame {
-    private final JTextArea chatTextArea;
+    private final JTextPane chatTextPane;
     private final JTextField textInputField;
     private final JList<String> connectedUsersList;
     private final Client client;
@@ -34,7 +35,10 @@ public class ChatApplicationGUI extends JFrame {
         setLocation(xOffset, yOffset);
 
         // Create components
-        chatTextArea = new JTextArea();
+        chatTextPane = new JTextPane();
+        //chatTextPane.setEditable(false);  // Make it non-editable
+        chatTextPane.setContentType("text/html"); // Set content type to HTML
+
         textInputField = new JTextField();
 //        JButton sendButton = new JButton("Send");
 //        JButton uploadButton = new JButton("Upload Image");
@@ -88,7 +92,7 @@ public class ChatApplicationGUI extends JFrame {
         chatPanel = new JPanel(new BorderLayout());
         TitledBorder titledBorder = BorderFactory.createTitledBorder("Chat Area");
         chatPanel.setBorder(titledBorder);
-        chatPanel.add(new JScrollPane(chatTextArea), BorderLayout.CENTER);
+        chatPanel.add(new JScrollPane(chatTextPane), BorderLayout.CENTER);
         return chatPanel;
     }
 
@@ -144,7 +148,10 @@ public class ChatApplicationGUI extends JFrame {
 
         if (sendTo.length > 0 && !message.isEmpty()) {
             setConversationalist(sendTo[sendTo.length-1]);
-            chatTextArea.append("You to " + Arrays.toString(sendTo) + ": " + message + "\n");
+            appendText("You to " + Arrays.toString(sendTo) + ": " + message + "\n");
+            if (imagePath != null) {
+                appendImage(new ImageIcon(imagePath));
+            }
             client.newMessage(sendTo, message, new ImageIcon(imagePath));
             resetTextField();
         }
@@ -158,25 +165,34 @@ public class ChatApplicationGUI extends JFrame {
     public void incomingMessage(String sender, String text, ImageIcon image, LocalDateTime timeSent, LocalDateTime timeReceived) {
         setConversationalist(sender);
 
+
         // Create Font object with a smaller size
-        Font smallFont = chatTextArea.getFont().deriveFont(Font.PLAIN, 10);
+        //Font smallFont = chatTextArea.getFont().deriveFont(Font.PLAIN, 10);
 
         // Format time sent and time received
         String formattedTimeSent = timeSent.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
         String formattedTimeReceived = timeReceived.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
 
         // Set the font for the time
-        chatTextArea.setFont(smallFont);
+        //chatTextArea.setFont(smallFont);
 
         // Append the message with formatted time
-        chatTextArea.append(sender + " to you: " + text + " (Sent: " + formattedTimeSent + ", Received: " + formattedTimeReceived + ")\n");
+        //chatTextArea.append(sender + " to you: " + text + " (Sent: " + formattedTimeSent + ", Received: " + formattedTimeReceived + ")\n");
+
+        // Example usage
+        // ;
+        String textm = sender + " to you: " + text + " (Sent: " + formattedTimeSent + ", Received: " + formattedTimeReceived + ")\n";
+        appendText(textm);
+
+
 
         if (image != null) {
             //CONTINUE HERE DISPLAY IMAGE
+            appendImage(image);
         }
 
         // Reset the font back to its original size
-        chatTextArea.setFont(chatTextArea.getFont().deriveFont(Font.PLAIN, 12));
+        //chatTextArea.setFont(chatTextArea.getFont().deriveFont(Font.PLAIN, 12));
 
         System.out.println("GUI: incomingMessage()");
     }
@@ -199,6 +215,30 @@ public class ChatApplicationGUI extends JFrame {
             titledBorder.setTitle("Chatting with " + str);
             chatPanel.repaint(); // Ensure the changes are reflected
             conversationalist = str;
+        }
+    }
+
+
+    private void appendText(String text) {
+        StyledDocument doc = chatTextPane.getStyledDocument();
+        SimpleAttributeSet style = new SimpleAttributeSet();
+        StyleConstants.setForeground(style, Color.BLACK);
+
+        try {
+            doc.insertString(doc.getLength(), text + "\n", style);
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void appendImage(ImageIcon imageIcon) {
+        MutableAttributeSet attrs = new SimpleAttributeSet();
+        StyleConstants.setIcon(attrs, imageIcon);
+
+        try {
+            chatTextPane.getDocument().insertString(chatTextPane.getDocument().getLength(), "Ignored Text", attrs);
+        } catch (BadLocationException e) {
+            e.printStackTrace();
         }
     }
 
