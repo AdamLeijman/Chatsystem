@@ -147,18 +147,53 @@ public class ChatApplicationGUI extends JFrame {
 
         if (sendTo.length > 0 && !message.isEmpty()) {
             setConversationalist(sendTo[sendTo.length-1]);
-            currConv.add("You to " + Arrays.toString(sendTo) + ": " + message + "\n");
             if (imagePath != null) {
                 String messageWithTime = ("You to " + Arrays.toString(sendTo) + ": " + message);
                 currConv.add(messageWithTime);
                 // Append HTML formatted message with image
-                currConv.add(new ImageIcon(imagePath));
+                ImageIcon imageIcon = new ImageIcon(imagePath);
+
+                Image a = rescaleMethod(imageIcon);
+                // Get the Image object from ImageIcon
+
+                // Create a new ImageIcon from the scaled image
+                ImageIcon scaledImageIcon = new ImageIcon(a);
+                currConv.add(scaledImageIcon);
+            } else {
+                currConv.add("You to " + Arrays.toString(sendTo) + ": " + message);
             }
             chatTextArea.setListData(currConv.toArray());
             client.newMessage(sendTo, message, new ImageIcon(imagePath));
             resetTextField();
         }
     }
+
+    private Image rescaleMethod(ImageIcon imageIcon) {
+        Image image = imageIcon.getImage();
+        int originalWidth = imageIcon.getIconWidth();
+        int originalHeight = imageIcon.getIconHeight();
+
+        int maxWidth = 400;
+        int maxHeight = 200;
+
+        // Beräkna skalningsfaktor för att bibehålla proportionerna och passa in i de maximala dimensionerna
+        double scaleFactor = Math.min((double) maxWidth / originalWidth, (double) maxHeight / originalHeight);
+
+        // Skala bilden med den beräknade skalningsfaktorn
+        int scaledWidth = (int) (originalWidth * scaleFactor);
+        int scaledHeight = (int) (originalHeight * scaleFactor);
+
+        return image.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
+    }
+
+
+/*    private Image rescaleMethod(ImageIcon imageIcon) {
+        Image image = imageIcon.getImage();
+        // Scale the image to maximum size of 50x50
+        return image.getScaledInstance(imageIcon.getIconWidth()/2, imageIcon.getIconHeight()/2, Image.SCALE_SMOOTH);
+    }
+
+ */
 
     private void resetTextField() {
         //imagePath = null;
@@ -178,15 +213,15 @@ public class ChatApplicationGUI extends JFrame {
         // Set the font for the time
         chatTextArea.setFont(smallFont);
 
-        // Append the message with formatted time
-        currConv.add(sender + " to you: " + text + " (Sent: " + formattedTimeSent + ", Received: " + formattedTimeReceived + ")\n");
-
-
         if (image != null) {
             String messageWithTime = sender + " to you: " + text + " (Sent: " + formattedTimeSent + ", Received: " + formattedTimeReceived + ")";
             currConv.add(messageWithTime);
             // Append HTML formatted message with image
-            currConv.add(image);
+            Image image2 = rescaleMethod(image);
+            currConv.add(new ImageIcon(image2));
+        } else {
+            // Append the message with formatted time
+            currConv.add(sender + " to you: " + text + " (Sent: " + formattedTimeSent + ", Received: " + formattedTimeReceived);
         }
         chatTextArea.setListData(currConv.toArray());
 
