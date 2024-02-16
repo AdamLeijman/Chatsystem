@@ -1,34 +1,36 @@
 package controller;
 
 import boundary.ChatApplicationGUI;
-import entity.*;
+import entity.Message;
+import entity.User;
+
 import javax.swing.*;
 import java.io.*;
-import java.net.*;
+import java.net.Socket;
 import java.time.LocalDateTime;
 import java.util.*;
 
-
 public class Client {
-    private ObjectOutputStream oos;
-    private ObjectInputStream ois;
-    private ChatApplicationGUI view;
-    private User user;
-    private Socket socket;
+    private final ObjectOutputStream oos;
+    private final ObjectInputStream ois;
+    private final ChatApplicationGUI view;
+    private final Socket socket;
     private User[] onlineUsers;
-    private int[] currIndexes = null;
-    private User[] currChatPartner;
-    private String name;
-    private final int port = 1441;
-    private String myAvatar = "avatars/1.jpeg";
+    private final String name;
 
-    public Client(String name, int off) {
-        this.name =name;
-        user = new User(name, null);
+    /**
+     * Constructor for the Client class
+     * @param name
+     * @param off
+     * @param myAvatar
+     */
+    public Client(String name, int off, String myAvatar) {
+        this.name = name;
+        User user = new User(name, null);
         view = new ChatApplicationGUI(this, off, myAvatar);
 
-
         try {
+            int port = 1441;
             socket = new Socket("127.0.0.1", port);
             System.out.println("Client: connected");
             ois = new ObjectInputStream(socket.getInputStream());
@@ -41,45 +43,25 @@ public class Client {
         receiveMessage();
     }
 
+    /**
+     * Method to receive messages
+     */
     public void receiveMessage() {
         Thread receiveMessageThread = new Thread(() -> {
             try {
                 while (true) {
                     Object obj = ois.readObject();
-                   
 
                     if (obj instanceof Message m) {
-                        /*
-                        int c=0;
-                        String[] conversationalists = new String[m.getReceivers().cou+1];
-                        for (User u : m.getReceivers()) {
-
-                                names.append(u.getUsername());
-                        }*/
-                        //names.append(m.getSender().getUsername());
-
-                        //currChatPartner = m.getReceivers();
-
-                        m.setTimeSent(LocalDateTime.now());
-
-                        System.out.println("HEY"+ m.getImage());
-
                         view.incomingMessage(m.getSender().getUsername(),
                                 m.getText(), m.getImage(), m.getTimeSent(), m.getTimeReceived());
-                    }
-                    /*else if (obj instanceof User[] uList) {
-                        //if(view.getReceivers().length<1) {
-                            onlineUsers = uList;
-                            view.setOnline(uList);
-                        //}
-                    }*/
-                    else if (obj instanceof User[] uList) {
+                    } else if (obj instanceof User[] uList) {
                         setOnline(uList);
                     }
                 }
-            } catch (IOException | ClassNotFoundException e) {
+            } catch (IOException | ClassNotFoundException ignored) {
             }
-            try{
+            try {
                 socket.close();
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -88,17 +70,15 @@ public class Client {
         receiveMessageThread.start();
     }
 
-    public void newMessage(String sTo[], String text, ImageIcon icon) {
-
+    public void newMessage(String[] sTo, String text, ImageIcon icon) {
         User me = findUserByUsername(onlineUsers, name);
-        User[] sendTo = new User[sTo.length];
-        for(int i=0; i<sTo.length;i++){
-            sendTo[i] = findUserByUsername(onlineUsers, sTo[i]);
-        }
+        User[] sendTo = Arrays.stream(sTo)
+                .map(username -> findUserByUsername(onlineUsers, username))
+                .toArray(User[]::new);
 
         Message message = new Message(me, sendTo, text, icon);
-        System.out.println(message.getImage());
-        //Message messageToAll = new Message(user, currChatPartner, recentMessage, (ImageIcon) icon);
+        message.setTimeSent(LocalDateTime.now());
+
         try {
             oos.writeObject(message);
             oos.flush();
@@ -107,28 +87,27 @@ public class Client {
         }
     }
 
-    private static User findUserByUsername(User[] users, String targetUsername) {
-        for (User user : users) {
-            if (user.getUsername().equals(targetUsername)) {
-                return user;  // Return the matching user directly
-            }
-        }
-
-        return new User("Null" + targetUsername, null);  // Return null if no match is found
+    /**
+     * Method to find a user by their username
+     * @param users
+     * @param targetUsername
+     * @return
+     */
+    private User findUserByUsername(User[] users, String targetUsername) {
+        return Arrays.stream(users)
+                .filter(user -> user.getUsername().equals(targetUsername))
+                .findFirst()
+                .orElse(new User("Null" + targetUsername, null));
     }
 
-
     private void setOnline(User[] uList) {
-        if (!Objects.equals(uList, onlineUsers)) {
-            ArrayList<String> userNames = new ArrayList<>();
-            for (User user : uList) {
-                String userName = user.getUsername();
-                userNames.add(userName);
-            }
-            onlineUsers = uList;
+        if (!Arrays.equals(uList, onlineUsers)) {
+            List<String> userNames = Arrays.stream(uList)
+                    .map(User::getUsername)
+                    .filter(username -> !username.equals(name))
+                    .toList();
 
-            //modify list to hide clients own name & update GUI by setOnline()
-            userNames.remove(name);
+            onlineUsers = uList;
             JList<String> userNameList = new JList<>(userNames.toArray(new String[0]));
             view.setOnline(userNameList);
         }
@@ -142,41 +121,27 @@ public class Client {
         try {
             if (socket != null && !socket.isClosed()) {
                 oos.writeObject("close");
-                // Close ObjectOutputStream first to ensure proper closure
-                if (oos != null) {
-                    oos.close();
-                }
+                oos.close();
 
-                // Close ObjectInputStream
                 if (ois != null) {
                     ois.close();
                 }
 
-                // Close the socket
                 socket.close();
             }
         } catch (IOException e) {
-            e.printStackTrace(); // Handle the exception according to your needs
+            e.printStackTrace();
         }
     }
 
     public void addContact(String[] newContacts) {
         try {
-            // Read existing contacts from the file
             Set<String> existingContacts = readExistingContacts();
-
-            // Append new contacts, avoiding duplicates
-            for (String contact : newContacts) {
-                if (!existingContacts.contains(contact)) {
-                    existingContacts.add(contact);
-                }
-            }
-
-            // Write the updated contacts back to the file
+            existingContacts.addAll(Arrays.asList(newContacts));
             writeContactsToFile(existingContacts);
 
         } catch (IOException e) {
-            e.printStackTrace(); // Handle the exception according to your application's needs
+            e.printStackTrace();
         }
     }
 
@@ -184,10 +149,7 @@ public class Client {
         Set<String> existingContacts = new HashSet<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader("files/contacts.txt"))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                existingContacts.add(line);
-            }
+            reader.lines().forEach(existingContacts::add);
         }
 
         return existingContacts;
@@ -195,12 +157,14 @@ public class Client {
 
     private void writeContactsToFile(Set<String> contacts) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("files/contacts.txt"))) {
-            for (String contact : contacts) {
-                writer.write(contact);
-                writer.newLine();
-            }
+            contacts.forEach(contact -> {
+                try {
+                    writer.write(contact);
+                    writer.newLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
         }
     }
 }
-
-

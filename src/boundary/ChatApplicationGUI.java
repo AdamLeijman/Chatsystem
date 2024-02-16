@@ -19,13 +19,19 @@ public class ChatApplicationGUI extends JFrame {
     private final ArrayList<Object> currConv = new ArrayList<>();
     private final JTextField textInputField;
     private final JList<String> connectedUsersList;
-    private JList<String> contactsList = new JList<>(new DefaultListModel<>());
+    private JList<String> contactsList;
     private final Client client;
     private String conversationalist;
     private JPanel chatPanel;
     private final String myAvatar;
     private String imagePath;
 
+    /**
+     * Constructor for the ChatApplicationGUI class
+     * @param client
+     * @param off
+     * @param myAvatar
+     */
     public ChatApplicationGUI(Client client, int off, String myAvatar) {
         this.myAvatar = myAvatar;
         this.client=client;
@@ -40,11 +46,8 @@ public class ChatApplicationGUI extends JFrame {
 
         // Create components
         chatTextArea = new JList<>();
-        // chatTextArea.setEditable(false);
         textInputField = new JTextField();
-//        JButton sendButton = new JButton("Send");
-//        JButton uploadButton = new JButton("Upload Image");
-//        JButton exitButton = new JButton("Exit");
+
         connectedUsersList = new JList<>(new String[]{"User1", "User2", "User3"}); // Replace with actual user data
         connectedUsersList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         contactsList = new JList<>(new String[]{"Cont1", "User2", "User3"}); // Replace with actual user data
@@ -58,13 +61,12 @@ public class ChatApplicationGUI extends JFrame {
         add(createInputPanel(), BorderLayout.SOUTH);
         add(createContactsPanel(), BorderLayout.EAST);
 
-        // Add action listener for the Send button
-//        uploadButton.addActionListener(e -> uploadImage());
-//        sendButton.addActionListener(e -> sendMessage());
-
         setVisible(true);
     }
 
+    /**
+     * Method to upload an image
+     */
     private void uploadImage() {
         // Create a file chooser
         JFileChooser fileChooser = new JFileChooser();
@@ -93,6 +95,11 @@ public class ChatApplicationGUI extends JFrame {
             System.out.println("File selection canceled");
         }
     }
+
+    /**
+     * Method to create the chat panel
+     * @return JPanel
+     */
     private JPanel createChatPanel() {
         chatPanel = new JPanel(new BorderLayout());
         TitledBorder titledBorder = BorderFactory.createTitledBorder("Chat Area");
@@ -134,7 +141,6 @@ public class ChatApplicationGUI extends JFrame {
 
         JLabel label = new JLabel(icon);
         buttonPanel.add(label);
-
 
         buttonPanel.add(sendButton);
         buttonPanel.add(uploadButton);
@@ -196,7 +202,6 @@ public class ChatApplicationGUI extends JFrame {
         return image.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
     }
 
-
     private void resetTextField() {
         //imagePath = null;
         textInputField.setText("Type your message here"); // Clear the text input field
@@ -233,7 +238,6 @@ public class ChatApplicationGUI extends JFrame {
         System.out.println("GUI: incomingMessage()");
     }
 
-
     public void setOnline(JList<String> userNames) {
         connectedUsersList.setModel(userNames.getModel());  // Update the model of the JList
         connectedUsersList.repaint();  // Refresh the display
@@ -245,14 +249,16 @@ public class ChatApplicationGUI extends JFrame {
         DefaultListModel<String> listModel = new DefaultListModel<>();
 
         for (String contact : existingContacts) {
-            listModel.addElement(contact);
+            // Avoid adding yourself to contacts
+            if (!contact.equals(client.getName())) {
+                listModel.addElement(contact);
+            }
         }
 
         contactsList.setModel(listModel);  // Update the model of the JList
         contactsList.repaint();  // Refresh the display
         System.out.println("GUI: setContacts()");
     }
-
 
     public String[] getSelectedUsers() {
         ArrayList<String> selectedUsersList = new ArrayList<>();
@@ -280,7 +286,6 @@ public class ChatApplicationGUI extends JFrame {
     private void addContact() {
         String[] sendTo = getSelectedUsers();
         client.addContact(sendTo);
-
 
         // Get the existing data from the JList
         ListModel<String> listModel = contactsList.getModel();
@@ -313,8 +318,6 @@ public class ChatApplicationGUI extends JFrame {
         TitledBorder titledBorder = BorderFactory.createTitledBorder("Contacts");
         contactsPanel.setBorder(titledBorder);
 
-
-
         JScrollPane contactsScrollPane = new JScrollPane(contactsList);
         contactsPanel.add(contactsScrollPane, BorderLayout.CENTER);
 
@@ -329,5 +332,4 @@ public class ChatApplicationGUI extends JFrame {
 
         return contactsPanel;
     }
-
 }

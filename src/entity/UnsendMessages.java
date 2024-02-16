@@ -10,43 +10,27 @@ public class UnsendMessages {
         // hämta ArrayList – om null skapa en och placera i unsend
         System.out.println("UnsendMessages: put() meddelande har lagrats");
 
-        //map.get("vishal")
         if (unsentMap.get(user)==null){
             ArrayList<Message> messageArrayList = new ArrayList<>();
             messageArrayList.add(message);
             unsentMap.put(user, messageArrayList);
-            System.out.println("UnsendMessages: message " + message.getText() + " added to NEW unsentMap");
+            System.out.println("UnsendMessages: message " + message.getText() + " added NEW to unsentMap");
         } else {
             unsentMap.get(user).add(message);
-            //unsentMap.put(user, unsentMap.get(user).add(message));
             System.out.println("UnsendMessages: message " + message.getText() + " added to unsentMap");
         }
     }
 
     public synchronized ArrayList<Message> get(User user) {
         String temp = "Null" + user.getUsername();
-
         for (Map.Entry<User, ArrayList<Message>> entry : unsentMap.entrySet()) {
             User usr = entry.getKey();
             if (usr.getUsername().equals(temp)) {
                 System.out.println("Match found for user: " + user.getUsername());
-
-
                 return entry.getValue();
             }
         }
-
-            return null;
-
-
-        // Returnera en kopia av ArrayList för att förhindra oavsiktlig ändring av listan
-
-        //ArrayList<Message> messages = unsentMap.get(user);
-        //if(messages == null){
-          //  return new ArrayList<>(messages);
-        //} else{
-          //  return new ArrayList<>();
-        //}
+        return null;
     }
 
     public synchronized void clear(){
@@ -61,7 +45,6 @@ public class UnsendMessages {
             return new ArrayList<>(messages);
             } else{
                 return new ArrayList<>();
-    }
-
+        }
     }
 }

@@ -9,11 +9,11 @@ import java.io.*;
 import java.time.LocalDateTime;
 
 public class Message implements Serializable {
-    private String text;
+    private final String text;
     private byte[] imageBytes;  // Use byte array to store image data
     private LocalDateTime timeSent = null;
     private LocalDateTime timeReceived = null;
-    private User sender;
+    private final User sender;
     private User[] receivers;
 
     public Message(User user, User[] receivers, String testText, ImageIcon imageIcon) {
@@ -45,10 +45,6 @@ public class Message implements Serializable {
 
     public User[] getReceivers() {
         return receivers;
-    }
-
-    public void setReceivers(User[] receivers) {
-        this.receivers = receivers;
     }
 
     public LocalDateTime getTimeSent() {
@@ -88,7 +84,6 @@ public class Message implements Serializable {
             return new byte[0];  // Handle the IOException by returning an empty byte array
         }
     }
-
 
     private ImageIcon byteToImageIcon(byte[] bytes) {
         try {

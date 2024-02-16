@@ -2,7 +2,6 @@ package controller;
 
 import boundary.ServerUI;
 import entity.*;
-
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -11,14 +10,17 @@ import java.util.*;
 
 public class Server extends Thread {
     private final int port;
-    private Clients newClients = new Clients();
+    private final Clients newClients = new Clients();
     private final UnsendMessages unsendMessages = new UnsendMessages();
-    private final ServerUI serverUI = new ServerUI(this);
+    private final ServerUI serverUI = new ServerUI();
 
     public Server(int port) {
         this.port = port;
     }
 
+    /**
+     * The run method creates a server socket and listens for incoming connections. When a connection is established, a new
+     */
     public void run() {
         try {
             ServerSocket serverSocket = new ServerSocket(port);
@@ -33,15 +35,19 @@ public class Server extends Thread {
         }
     }
 
+    /**
+     * The Clients class is a synchronized class that contains a HashMap of User and ClientThread objects. The put method
+     * adds a new User and ClientThread to the HashMap. The remove method removes a User and ClientThread from the HashMap.
+     */
     public class Clients {
-        private HashMap<User, ClientThread> clients = new HashMap<>();
+        private final HashMap<User, ClientThread> clients = new HashMap<>();
 
         public synchronized void put(User user, ClientThread client) {
             clients.put(user, client);
         }
 
-        public synchronized ClientThread remove(User user) {
-            return clients.remove(user);
+        public synchronized void remove(User user) {
+            clients.remove(user);
         }
 
         public synchronized HashMap<User, ClientThread> getClients() {
@@ -49,12 +55,16 @@ public class Server extends Thread {
         }
     }
 
+    /**
+     * The ClientThread class is a Runnable class that handles the communication with a client. The run method creates an
+     * ObjectOutputStream and ObjectInputStream for the client socket. It then reads a User object from the client and adds
+     * the User and ClientThread to the newClients HashMap. It then creates a new Writer object and a new Reader object.
+     */
     public class ClientThread implements Runnable {
         public ObjectInputStream is = null;
         public ObjectOutputStream os = null;
-        private Socket clientSocket;
+        private final Socket clientSocket;
         private User user;
-        private Reader reader;
         private Writer writer;
         private User[] connectedUsers;
 
@@ -73,13 +83,10 @@ public class Server extends Thread {
 
                 writer = new Writer();
 
-
-                reader = new Reader(writer);
+                new Reader(writer);
                 System.out.println("Connection Est");
 
-            } catch (IOException e) {
-                //System.out.println("User Session terminated");
-            } catch (ClassNotFoundException e) {
+            } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -89,7 +96,7 @@ public class Server extends Thread {
         }
 
         private class Reader {
-            private Writer writer;
+            private final Writer writer;
             boolean isRunning = true;
 
             public Reader(Writer writer) {
@@ -129,7 +136,15 @@ public class Server extends Thread {
             }
         }
 
+        /**
+         * The Writer class is a Runnable class that sends messages to the clients. The run method calls the updateConnections
+         * and checkUnsentMessages methods every 5 seconds. The updateConnections method sends the connectedUsers array to all
+         * clients if it has changed. The checkUnsentMessages method sends any unsent messages to the receivers.
+         */
         private class Writer implements Runnable {
+            /**
+             * The run method calls the updateConnections and checkUnsentMessages methods every 5 seconds.
+             */
             @Override
             public void run() {
                 while (true) {
@@ -143,6 +158,10 @@ public class Server extends Thread {
                 }
             }
 
+            /**
+             * Checks if there are any unsent messages and sends them
+             * @throws IOException
+             */
             private synchronized void checkUnsentMessages() throws IOException {
                 ArrayList<Message> arrayList = unsendMessages.get(user);
                 if (arrayList != null) {
@@ -164,11 +183,9 @@ public class Server extends Thread {
                 }
 
                 if (connectedUsers == null || !areArraysEqual(connectedUsers, uList)) {
-
                     Iterator cIterator = newClients.getClients().entrySet().iterator();
                     while (cIterator.hasNext()) {
                         Map.Entry mapElement = (Map.Entry) cIterator.next();
-                        //System.out.println("HashMap after adding bonus marks:" + mapElement.getValue());
                         ClientThread ch = (ClientThread) mapElement.getValue();
                         ch.getOs().writeObject(uList);
                     }
@@ -176,6 +193,11 @@ public class Server extends Thread {
                 }
             }
 
+            /**
+             * Sends the message to the receivers
+             * @param m
+             * @throws IOException
+             */
             public void sendCurrMessage(Message m) throws IOException {
                 for (User user : m.getReceivers()) {
                     if (user.getUsername().startsWith("Null")) {
@@ -190,10 +212,14 @@ public class Server extends Thread {
                     }
                 }
             }
-
         }
 
-
+        /**
+         * Checks if two arrays are equal
+         * @param array1
+         * @param array2
+         * @return
+         */
         public boolean areArraysEqual(User[] array1, User[] array2) {
             if (array1.length != array2.length) {
                 return false;
@@ -205,13 +231,5 @@ public class Server extends Thread {
             }
             return true;
         }
-
-
     }
 }
-
-
-
-
-
-
