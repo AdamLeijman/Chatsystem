@@ -142,11 +142,11 @@ public class ChatApplicationGUI extends JFrame {
         // Add action listener for the Send button
         sendButton.addActionListener(e -> sendMessage());
         uploadButton.addActionListener(e2 -> uploadImage());
-        /*exitButton.addActionListener(e3 -> {
+        exitButton.addActionListener(e3 -> {
             // Get the top-level container (JFrame) of the buttonPanel
             SwingUtilities.getWindowAncestor(buttonPanel).dispose();
             client.shutDown();
-        });*/
+        });
         return buttonPanel;
     }
 

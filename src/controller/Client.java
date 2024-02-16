@@ -141,6 +141,7 @@ public class Client {
     public void shutDown() {
         try {
             if (socket != null && !socket.isClosed()) {
+                oos.writeObject("close");
                 // Close ObjectOutputStream first to ensure proper closure
                 if (oos != null) {
                     oos.close();

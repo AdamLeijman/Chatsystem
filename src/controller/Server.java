@@ -103,7 +103,9 @@ public class Server extends Thread {
 
                         Object obj = is.readObject();
                         if (obj instanceof Message m) {
-                            m.setTimeReceived(LocalDateTime.now());
+                            LocalDateTime date = LocalDateTime.now();
+                            m.setTimeReceived(date);
+                            writeToU
                             writer.sendCurrMessage(m);
                         }
 
