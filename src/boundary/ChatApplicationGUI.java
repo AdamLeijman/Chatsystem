@@ -37,7 +37,7 @@ public class ChatApplicationGUI extends JFrame {
 
         // Create components
         chatTextArea = new JList<>();
-       // chatTextArea.setEditable(false);
+        // chatTextArea.setEditable(false);
         textInputField = new JTextField();
 //        JButton sendButton = new JButton("Send");
 //        JButton uploadButton = new JButton("Upload Image");
