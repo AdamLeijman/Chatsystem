@@ -1,5 +1,7 @@
 package controller;
 
+import boundary.ServerUI;
+
 import java.util.function.ToDoubleBiFunction;
 
 public class Main {
@@ -19,6 +21,8 @@ public class Main {
 
         Server server = new Server(1441);
         server.start();
+
+        ServerUI serverUI = new ServerUI(server);
 
         try {
             Thread.sleep(1000);
