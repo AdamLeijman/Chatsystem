@@ -76,7 +76,7 @@ public class ServerUI {
         } catch (IOException e){e.printStackTrace();}
     }
 
-    public void addInfo(LocalDateTime received, LocalDateTime sent){
+    public void addInfo(LocalDateTime sent, LocalDateTime received){
         BufferedReader bf= null;
         ArrayList<String> tempList = new ArrayList<String>();
         try {
