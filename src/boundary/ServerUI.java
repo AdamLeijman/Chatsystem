@@ -1,38 +1,26 @@
 package boundary;
 
 import javax.swing.*;
-import javax.swing.text.MaskFormatter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.text.ParseException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
 public class ServerUI {
     private JFrame frame;
     private JPanel south, center;
     private JList<String> info;
-    private JFormattedTextField startTimeField, endTimeField;
-    private ArrayList<String> tempList; // Declare tempList at the class level
-    private JTextField daysField; // Replace endTimeField with daysField
-    private String targetDate = "2024-02-16";
+    private LocalDateTime startDateTime = null;
+    private LocalDateTime endDateTime = null;
+    private JLabel startDateTimeLabel;
+    private JLabel endDateTimeLabel;
 
 
     public ServerUI() {
         createUI();
     }
 
-    /**
-     * Creates the UI for the server
-     */
     public void createUI() {
         SwingUtilities.invokeLater(() -> {
             frame = new JFrame("Server UI");
@@ -54,108 +42,111 @@ public class ServerUI {
             south = new JPanel();
             south.setPreferredSize(new Dimension(100, 100));
 
-            // Add days field
-            daysField = new JTextField(5); // Set the preferred size as needed
-
-            // Add filter button
             JButton filterButton = new JButton("Filter");
-            filterButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    filterDate();
-                }
-            });
-
-            // Add components to the south panel
-            south.add(new JLabel("Last N Days:"));
-            south.add(daysField); // Replace endTimeField with daysField
+            filterButton.addActionListener(e -> filter());  // Add ActionListener for the button
             south.add(filterButton);
 
-            tempList = new ArrayList<>();
+            JButton reset = new JButton("Reset");
+            reset.addActionListener(e -> resetFilter());  // Add ActionListener for the button
+            south.add(reset);
+
+            // Initialize JLabels
+            startDateTimeLabel = new JLabel("Start Date Time: N/A");
+            endDateTimeLabel = new JLabel("End Date Time: N/A");
+            south.add(startDateTimeLabel);
+            south.add(endDateTimeLabel);
 
             frame.add(south, BorderLayout.SOUTH);
             frame.add(center, BorderLayout.CENTER);
             frame.setVisible(true);
             addExistingInfo();
         });
+
     }
 
     private void addExistingInfo() {
-        BufferedReader bf;
-        try {
-            bf = new BufferedReader(new FileReader("files/Traffic.txt"));
-            String line = bf.readLine();
-            while (line != null && !line.startsWith(targetDate)) {
-                tempList.add(line);
-                line = bf.readLine();
-            }
-            String[] tempArray = new String[tempList.size()];
-            for (int i = 0; i < tempList.size(); i++) {
-                tempArray[i] = tempList.get(i);
-            }
-            info.setListData(tempArray);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Adds the sent and received time to the file
-     * @param sent
-     * @param received
-     */
-    public void addInfo(LocalDateTime sent, LocalDateTime received){
-        System.out.println(sent + " " + received    );
         BufferedReader bf;
         ArrayList<String> tempList = new ArrayList<>();
         try {
             bf = new BufferedReader(new FileReader("files/Traffic.txt"));
             String line = bf.readLine();
-            while (line != null) {
-                tempList.add(line);
+            while (line!= null) {
+
+                if (isLineOk(line)) {
+                    tempList.add(line);
+                }
                 line = bf.readLine();
             }
-            BufferedWriter out = new BufferedWriter(new FileWriter("files/Traffic.txt"));
-            System.out.println("Server: logged message at " + sent);
-            tempList.add(sent + " " + received);
-            for (String s : tempList) {
-                out.write(s + "\n");
-            }
-            String newMessage = sent + " " + received + "\n";
-            Files.write(Paths.get("files/Traffic.txt"), newMessage.getBytes(), StandardOpenOption.APPEND);
-
             String[] tempArray = new String[tempList.size()];
             for (int i = 0; i< tempList.size(); i++){
                 tempArray[i] = tempList.get(i);
             }
             info.setListData(tempArray);
-            out.close();
         } catch (IOException e){e.printStackTrace();}
     }
 
-    private void filterDate() {
+    private boolean isLineOk(String line) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+
         try {
-            int lastNDays = Integer.parseInt(daysField.getText());
-            LocalDate currentDate = LocalDate.now();
-            LocalDate targetDate = currentDate.minusDays(lastNDays);
+            // Extract the first X characters (representing the date) from the line
+            String datePart = line.substring(0, 16);
+            LocalDateTime rowDate = LocalDateTime.parse(datePart, formatter);
 
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            return (startDateTime==null || rowDate.isAfter(startDateTime))
+                    && (endDateTime==null || rowDate.isBefore(endDateTime));
 
-            this.targetDate = targetDate.format(formatter);
-            System.out.println("Target Date set to: " + this.targetDate);
-        } catch (NumberFormatException | DateTimeParseException ex) {
-            System.err.println("Invalid input for last N days. Please enter a valid number.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
-        // Clear history and update JList
-        tempList.clear();
-        DefaultListModel<String> model = new DefaultListModel<>();
-        info.setModel(model);
-        addExistingInfo();
+    }
+
+    public void addInfo(LocalDateTime sent, LocalDateTime received) {
+        try {
+            BufferedWriter out = new BufferedWriter(new FileWriter("files/Traffic.txt", true));
+            String newMessage = sent + " " + received + "\n";
+            out.write(newMessage);
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace(); // Handle the exception appropriately
+        }
     }
 
 
+    public void filter(){
+        String inputDate1 = JOptionPane.showInputDialog("Enter the start date (yyyy-MM-dd):");
+        String inputTime1 = JOptionPane.showInputDialog("Enter the start time (HH:mm):");
 
+        String inputDate2 = JOptionPane.showInputDialog("Enter the end date (yyyy-MM-dd):");
+        String inputTime2 = JOptionPane.showInputDialog("Enter the end time (HH:mm):");
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+        try {
+            startDateTime = LocalDateTime.parse(inputDate1 +'T'+ inputTime1, formatter);
+        } catch (Exception e) {
+            System.out.println("ServerUI: invalid start date or time");
+        }
+        try {
+            endDateTime = LocalDateTime.parse(inputDate2 +'T'+ inputTime2, formatter);
+        } catch (Exception e) {
+            System.out.println("ServerUI: invalid end date or time");
+        }
+        clearAndUpdateWindow();
+    }
 
+    private void resetFilter() {
+        startDateTime = null;
+        endDateTime =null;
+        clearAndUpdateWindow();
+    }
+
+    private void clearAndUpdateWindow() {
+        info.setListData(new String[0]);  // Clear the list data by setting an empty array
+        addExistingInfo();
+
+        startDateTimeLabel.setText("Start Date Time: " + startDateTime);
+        endDateTimeLabel.setText("End Date Time: " + endDateTime);
+    }
 
 }

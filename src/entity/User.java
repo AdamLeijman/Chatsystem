@@ -18,7 +18,7 @@ public class User implements Serializable { // Även användas i strömmar
         if(image != null) {
             setImageIcon(image);
         } else {
-            System.out.println("User has no image");
+            //System.out.println("User has no image");
         }
     }
 
