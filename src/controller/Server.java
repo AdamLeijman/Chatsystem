@@ -27,6 +27,7 @@ public class Server extends Thread {
             System.out.println("Server: skapad");
             while (true) {
                 Socket socket = serverSocket.accept();
+
                 ClientThread ch = new ClientThread(socket);
                 new Thread(ch).start();
             }
@@ -81,6 +82,10 @@ public class Server extends Thread {
                 user = (User) obj;
                 newClients.put(user, this);
 
+                serverUI.addInfo(LocalDateTime.now(),
+                        null,
+                        ", Login from " + user.getUsername());
+
                 writer = new Writer();
 
                 new Reader(writer);
@@ -113,13 +118,18 @@ public class Server extends Thread {
                         Object obj = is.readObject();
                         if (obj instanceof Message m) {
                             m.setTimeReceived(LocalDateTime.now());
-                            serverUI.addInfo(m.getTimeSent(), m.getTimeReceived());
+
+
                             writer.sendCurrMessage(m);
                         }
 
                         if (obj instanceof String s) {
                             if (s.equals("close")) {
                                 isRunning = false;
+
+                                serverUI.addInfo(LocalDateTime.now(),
+                                        null,
+                                        ", Logout from " + user.getUsername());
                             }
                         }
                     }
@@ -167,6 +177,14 @@ public class Server extends Thread {
                 if (arrayList != null) {
                     unsendMessages.clear();
                     for (Message m : arrayList) {
+
+                        m.setTimeReceived(LocalDateTime.now()); //Update time received for unsent messages
+
+                        serverUI.addInfo(m.getTimeSent(),
+                                m.getTimeReceived(),
+                                ", Message from " + m.getSender().getUsername() +
+                                        " to " + user.getUsername());
+
                         getOs().writeObject(m);
                         getOs().flush();
                     }
@@ -202,9 +220,17 @@ public class Server extends Thread {
                 for (User user : m.getReceivers()) {
                     if (user.getUsername().startsWith("Null")) {
                         unsendMessages.put(user, m);
+
+
                     } else {
                         for (User u : newClients.getClients().keySet()) {
                             if (Objects.equals(u.getUsername(), user.getUsername())) {
+
+                                serverUI.addInfo(m.getTimeSent(),
+                                        m.getTimeReceived(),
+                                        ", Message from " + m.getSender().getUsername() +
+                                                " to " + u.getUsername());
+
                                 newClients.getClients().get(u).os.writeObject(m);
                             }
                         }

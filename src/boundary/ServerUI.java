@@ -25,17 +25,17 @@ public class ServerUI {
         SwingUtilities.invokeLater(() -> {
             frame = new JFrame("Server UI");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(500, 500);
+            frame.setSize(1000, 500);
             frame.setLayout(new BorderLayout(10, 10));
             frame.setLocationRelativeTo(null);
             frame.setResizable(false);
 
             center = new JPanel();
-            center.setPreferredSize(new Dimension(500, 400));
+            center.setPreferredSize(new Dimension(1000, 400));
             info = new JList<>();
 
             JScrollPane scrollPane = new JScrollPane(info);
-            scrollPane.setPreferredSize(new Dimension(350, 300));
+            scrollPane.setPreferredSize(new Dimension(900, 300));
             scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
             center.add(scrollPane);
 
@@ -102,10 +102,10 @@ public class ServerUI {
         }
     }
 
-    public void addInfo(LocalDateTime sent, LocalDateTime received) {
+    public void addInfo(LocalDateTime sent, LocalDateTime received, String event) {
         try {
             BufferedWriter out = new BufferedWriter(new FileWriter("files/Traffic.txt", true));
-            String newMessage = sent + " " + received + "\n";
+            String newMessage = sent + " " + received + event + "\n";
             out.write(newMessage);
             out.close();
         } catch (IOException e) {
