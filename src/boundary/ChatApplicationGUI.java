@@ -22,6 +22,7 @@ public class ChatApplicationGUI extends JFrame {
     private JList<String> contactsList;
     private final Client client;
     private String conversationalist;
+    private JLabel conversationalistImage;
     private JPanel chatPanel;
     private final String myAvatar;
     private String imagePath;
@@ -55,6 +56,9 @@ public class ChatApplicationGUI extends JFrame {
 
         // Set layouts
         setLayout(new BorderLayout());
+
+        conversationalistImage = new JLabel("Chatting with none: ");
+        add(conversationalistImage, BorderLayout.NORTH);
 
         // Add components to the frame
         add(createChatPanel(), BorderLayout.CENTER);
@@ -162,7 +166,7 @@ public class ChatApplicationGUI extends JFrame {
         String message = textInputField.getText();
 
         if (sendTo.length > 0 && !message.isEmpty()) {
-            setConversationalist(sendTo[sendTo.length-1]);
+            setConversationalist(sendTo[sendTo.length-1], null);
             if (imagePath != null) {
                 String messageWithTime = ("You to " + Arrays.toString(sendTo) + ": " + message);
                 currConv.add(messageWithTime);
@@ -207,8 +211,9 @@ public class ChatApplicationGUI extends JFrame {
         textInputField.setText("Type your message here"); // Clear the text input field
     }
 
-    public void incomingMessage(String sender, String text, ImageIcon image, LocalDateTime timeSent, LocalDateTime timeReceived) {
-        setConversationalist(sender);
+    public void incomingMessage(String sender, String text, ImageIcon image,
+                                LocalDateTime timeSent, LocalDateTime timeReceived, ImageIcon senderProfileImage){
+        setConversationalist(sender, senderProfileImage);
 
         // Create Font object with a smaller size
         Font smallFont = chatTextArea.getFont().deriveFont(Font.PLAIN, 10);
@@ -273,15 +278,29 @@ public class ChatApplicationGUI extends JFrame {
         return selectedUsersList.toArray(new String[0]);
     }
 
-    public void setConversationalist(String str) {
-        if (!Objects.equals(conversationalist, str)) {
+    public void setConversationalist(String str, ImageIcon image) {
+        if (image != null) {
+            // Handle image conversationalist logic here
+            ImageIcon scaledImageIcon = new ImageIcon(resizeImage(image.getImage(), 30, 30));  // Adjust the size as needed
+            conversationalistImage.setIcon(scaledImageIcon);
+        }
+        if (str!=null) {
+            conversationalistImage.setText(str);
+        }
+        /*if (!Objects.equals(conversationalist, str)) {
             connectedUsersList.setSelectedValue(str, true); //selects item in the jlist
             TitledBorder titledBorder = (TitledBorder) chatPanel.getBorder();
             titledBorder.setTitle("Chatting with " + str);
             chatPanel.repaint(); // Ensure the changes are reflected
             conversationalist = str;
-        }
+        }*/
     }
+
+    private Image resizeImage(Image originalImage, int targetWidth, int targetHeight) {
+        Image resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
+        return resultingImage;
+    }
+
 
     private void addContact() {
         String[] sendTo = getSelectedUsers();

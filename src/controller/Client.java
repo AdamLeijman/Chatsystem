@@ -26,7 +26,7 @@ public class Client {
      */
     public Client(String name, int off, String myAvatar) {
         this.name = name;
-        User user = new User(name, null);
+        User user = new User(name, new ImageIcon(myAvatar));
         view = new ChatApplicationGUI(this, off, myAvatar);
 
         try {
@@ -54,7 +54,8 @@ public class Client {
 
                     if (obj instanceof Message m) {
                         view.incomingMessage(m.getSender().getUsername(),
-                                m.getText(), m.getImage(), m.getTimeSent(), m.getTimeReceived());
+                                m.getText(), m.getImage(), m.getTimeSent(), m.getTimeReceived(),
+                                m.getSender().getImage());
                     } else if (obj instanceof User[] uList) {
                         setOnline(uList);
                     }
@@ -75,6 +76,8 @@ public class Client {
         User[] sendTo = Arrays.stream(sTo)
                 .map(username -> findUserByUsername(onlineUsers, username))
                 .toArray(User[]::new);
+
+
 
         Message message = new Message(me, sendTo, text, icon);
         message.setTimeSent(LocalDateTime.now());

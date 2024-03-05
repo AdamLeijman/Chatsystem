@@ -95,4 +95,5 @@ public class Message implements Serializable {
             return null;
         }
     }
+
 }
