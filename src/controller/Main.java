@@ -25,9 +25,9 @@ public class Main {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        new Client("Frederic", 0, "avatars/1.jpeg");
-        new Client("John", 1, "avatars/0.png");
-        new Client("Josephine", 2, "avatars/1.jpeg");
+        new Client(0);
+        new Client(1);
+        new Client(2);
 
 
         try {
@@ -35,6 +35,6 @@ public class Main {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        new Client("Ewa", 3, "avatars/1.jpeg");
+        new Client(3);
     }
 }

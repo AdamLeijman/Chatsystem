@@ -20,12 +20,11 @@ public class Client {
 
     /**
      * Constructor for the Client class
-     * @param name
      * @param off
-     * @param myAvatar
      */
-    public Client(String name, int off, String myAvatar) {
-        this.name = name;
+    public Client(int off) {
+        this.name = chooseName();
+        String myAvatar = chooseAvatar();
         User user = new User(name, new ImageIcon(myAvatar));
         view = new ChatApplicationGUI(this, off, myAvatar);
 
@@ -41,6 +40,29 @@ public class Client {
             throw new RuntimeException(e);
         }
         receiveMessage();
+    }
+
+    /**
+     * Method to select a name for the client
+     * @return a String with a name
+     */
+    private String chooseName(){
+        return JOptionPane.showInputDialog(null, "Enter name");
+    }
+
+    /**
+     * Method to select an avatar for the client
+     * @return a String with the path to the avatar
+     */
+    private String chooseAvatar(){
+        String[] options = {"0", "1"};
+        int choice = JOptionPane.showOptionDialog(null, "Choose avatar", "Choose avatar",
+                JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+        if (choice == 0) {
+            return  "avatars/0.png";
+        } else {
+            return "avatars/1.jpeg";
+        }
     }
 
     /**

@@ -258,4 +258,9 @@ public class Server extends Thread {
             return true;
         }
     }
+
+    public static void main(String[] args) {
+        Server server = new Server(1441);
+        server.start();
+    }
 }

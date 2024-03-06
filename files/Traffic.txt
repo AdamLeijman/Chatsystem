@@ -40,3 +40,19 @@
 2024-03-05T20:28:33.282453 null, Login from Ewa
 2024-03-05T20:27:51.326949 2024-03-05T20:28:33.297025, Message from Frederic to Ewa
 2024-03-05T20:29:15.631638 2024-03-05T20:29:15.633774, Message from Ewa to Frederic
+2024-03-06T15:19:21.114277 null, Login from Adam
+2024-03-06T15:19:55.373945 null, Login from Fredric
+2024-03-06T15:23:09.603623 null, Login from Adam
+2024-03-06T15:23:28.178178 null, Login from Ewa
+2024-03-06T15:23:17.416832 2024-03-06T15:23:28.180068, Message from Adam to Ewa
+2024-03-06T15:33:17.096558 null, Login from Adam
+2024-03-06T15:33:21.331875 null, Login from Eric
+2024-03-06T15:33:30.850810 null, Login from Ewa
+2024-03-06T15:33:40.313658 2024-03-06T15:33:40.325509, Message from Ewa to Adam
+2024-03-06T15:33:51.701420 2024-03-06T15:33:51.706385, Message from Adam to Ewa
+2024-03-06T15:34:34.700888 null, Login from John
+2024-03-06T15:34:43.630870 2024-03-06T15:34:43.633687, Message from John to Ewa
+2024-03-06T15:34:53.080719 null, Logout from John
+2024-03-06T15:34:58.348986 null, Logout from Eric
+2024-03-06T15:35:02.054761 null, Logout from Ewa
+2024-03-06T15:35:03.061355 null, Logout from Adam
