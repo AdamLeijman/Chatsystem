@@ -5,7 +5,11 @@ import java.util.*;
 public class UnsendMessages {
     private HashMap<User, ArrayList<Message>> unsentMap = new HashMap<>();
 
-    // egna tillägg
+    /**
+     * Puts a new message into the unsentMap
+     * @param user the receiver of the message
+     * @param message the message to be added
+     */
     public synchronized void put(User user, Message message) {
         // hämta ArrayList – om null skapa en och placera i unsend
         System.out.println("UnsendMessages: put() meddelande har lagrats");
@@ -21,6 +25,11 @@ public class UnsendMessages {
         }
     }
 
+    /**
+     * Returns the ArrayList of messages for a given user
+     * @param user the receiver of the message
+     * @return the ArrayList of messages for a given user
+     */
     public synchronized ArrayList<Message> get(User user) {
         String temp = "Null" + user.getUsername();
         for (Map.Entry<User, ArrayList<Message>> entry : unsentMap.entrySet()) {
@@ -33,18 +42,11 @@ public class UnsendMessages {
         return null;
     }
 
+    /**
+     * Clears the hashmap
+     */
     public synchronized void clear(){
         unsentMap.clear();
     }
 
-    // fler synchronized-metoder som behövs
-    public synchronized ArrayList<Message> deliver(User user){
-        // Metod för att leverera alla meddelanden för en viss användare, när de ansluter sig till systemet
-        ArrayList<Message> messages = unsentMap.remove(user);
-            if(messages != null){
-            return new ArrayList<>(messages);
-            } else{
-                return new ArrayList<>();
-        }
-    }
 }

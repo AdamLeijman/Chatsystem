@@ -1,7 +1,6 @@
 package boundary;
 
 import controller.Client;
-
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -11,7 +10,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.Set;
 
 public class ChatApplicationGUI extends JFrame {
@@ -21,17 +19,15 @@ public class ChatApplicationGUI extends JFrame {
     private final JList<String> connectedUsersList;
     private JList<String> contactsList;
     private final Client client;
-    private String conversationalist;
     private JLabel conversationalistImage;
-    private JPanel chatPanel;
     private final String myAvatar;
     private String imagePath;
 
     /**
      * Constructor for the ChatApplicationGUI class
-     * @param client
-     * @param off
-     * @param myAvatar
+     * @param client the client that this GUI is associated with
+     * @param off the offset of the window
+     * @param myAvatar the url of the avatar of the user that is currently logged in
      */
     public ChatApplicationGUI(Client client, int off, String myAvatar) {
         this.myAvatar = myAvatar;
@@ -39,7 +35,6 @@ public class ChatApplicationGUI extends JFrame {
         // Set up the main frame
         setTitle(client.getName());
         setSize(600, 400);
-        //setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         int xOffset = 600 * off;
         int yOffset = 300 * off;
@@ -105,13 +100,17 @@ public class ChatApplicationGUI extends JFrame {
      * @return JPanel
      */
     private JPanel createChatPanel() {
-        chatPanel = new JPanel(new BorderLayout());
+        JPanel chatPanel = new JPanel(new BorderLayout());
         TitledBorder titledBorder = BorderFactory.createTitledBorder("Chat Area");
         chatPanel.setBorder(titledBorder);
         chatPanel.add(new JScrollPane(chatTextArea), BorderLayout.CENTER);
         return chatPanel;
     }
 
+    /**
+     * Creates the input field for the chat application
+     * @return JPanel containing the input field
+     */
     private JPanel createInputPanel() {
         JPanel inputPanel = new JPanel(new BorderLayout());
         TitledBorder titledBorder = BorderFactory.createTitledBorder("Input Area");
@@ -131,6 +130,10 @@ public class ChatApplicationGUI extends JFrame {
         return inputPanel;
     }
 
+    /**
+     * Method to create the buttons to send a message, upload an image, and exit.
+     * @return a JPanel containing the buttons
+     */
     private JPanel createSendButtonPanel() {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
@@ -160,6 +163,9 @@ public class ChatApplicationGUI extends JFrame {
         return buttonPanel;
     }
 
+    /**
+     * Method to send a message
+     */
     private void sendMessage() {
         System.out.println("GUI: sendMessage()");
         String[] sendTo = getSelectedUsers();
@@ -188,6 +194,11 @@ public class ChatApplicationGUI extends JFrame {
         }
     }
 
+    /**
+     * Method to rescale an image to fit within the frame
+     * @param imageIcon the image to rescale
+     * @return an image scaled to fit within the frame
+     */
     private Image rescaleMethod(ImageIcon imageIcon) {
         Image image = imageIcon.getImage();
         int originalWidth = imageIcon.getIconWidth();
@@ -206,11 +217,23 @@ public class ChatApplicationGUI extends JFrame {
         return image.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
     }
 
+    /**
+     * Resets the text input field.
+     */
     private void resetTextField() {
         //imagePath = null;
         textInputField.setText("Type your message here"); // Clear the text input field
     }
 
+    /**
+     * Method to receive a message
+     * @param sender the sender of the message
+     * @param text the message text
+     * @param image the message image
+     * @param timeSent the time when the message was sent
+     * @param timeReceived the time when the message was received
+     * @param senderProfileImage the profile image of the sender
+     */
     public void incomingMessage(String sender, String text, ImageIcon image,
                                 LocalDateTime timeSent, LocalDateTime timeReceived, ImageIcon senderProfileImage){
         setConversationalist(sender, senderProfileImage);
@@ -249,6 +272,10 @@ public class ChatApplicationGUI extends JFrame {
         System.out.println("GUI: setOnline()");
     }
 
+    /**
+     * Method to add a new contact to the list of contacts
+     * @throws IOException if there is an error reading the contacts
+     */
     public void setContacts() throws IOException {
         Set<String> existingContacts = client.readExistingContacts();
         DefaultListModel<String> listModel = new DefaultListModel<>();
@@ -265,6 +292,10 @@ public class ChatApplicationGUI extends JFrame {
         System.out.println("GUI: setContacts()");
     }
 
+    /**
+     * Method to get the selected users from the connectedUsersList and contactsList to send a message to.
+     * @return an array of selected users
+     */
     public String[] getSelectedUsers() {
         ArrayList<String> selectedUsersList = new ArrayList<>();
 
@@ -278,6 +309,11 @@ public class ChatApplicationGUI extends JFrame {
         return selectedUsersList.toArray(new String[0]);
     }
 
+    /**
+     * Method to set the conversationalist
+     * @param str the name of the conversationalist
+     * @param image the image of the conversationalist
+     */
     public void setConversationalist(String str, ImageIcon image) {
         if (image != null) {
             // Handle image conversationalist logic here
@@ -287,21 +323,22 @@ public class ChatApplicationGUI extends JFrame {
         if (str!=null) {
             conversationalistImage.setText(str);
         }
-        /*if (!Objects.equals(conversationalist, str)) {
-            connectedUsersList.setSelectedValue(str, true); //selects item in the jlist
-            TitledBorder titledBorder = (TitledBorder) chatPanel.getBorder();
-            titledBorder.setTitle("Chatting with " + str);
-            chatPanel.repaint(); // Ensure the changes are reflected
-            conversationalist = str;
-        }*/
     }
 
+    /**
+     * Method to resize an image to fit within the frame
+     * @param originalImage the image to resize
+     * @param targetWidth the target width of the image
+     * @param targetHeight the target height of the image
+     * @return an image scaled to fit within the frame
+     */
     private Image resizeImage(Image originalImage, int targetWidth, int targetHeight) {
-        Image resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
-        return resultingImage;
+        return originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
     }
 
-
+    /**
+     * Method to add a new contact to the list of contacts
+     */
     private void addContact() {
         String[] sendTo = getSelectedUsers();
         client.addContact(sendTo);
@@ -332,6 +369,10 @@ public class ChatApplicationGUI extends JFrame {
         contactsList.setModel(defaultListModel);
     }
 
+    /**
+     * Creates a panel containing the list of contacts and a button to add them to the contacts list
+     * @return a panel containing the list of contacts
+     */
     private JPanel createContactsPanel() {
         JPanel contactsPanel = new JPanel(new BorderLayout());
         TitledBorder titledBorder = BorderFactory.createTitledBorder("Contacts");

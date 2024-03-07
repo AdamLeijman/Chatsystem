@@ -3,7 +3,6 @@ package controller;
 import boundary.ChatApplicationGUI;
 import entity.Message;
 import entity.User;
-
 import javax.swing.*;
 import java.io.*;
 import java.net.Socket;
@@ -20,7 +19,7 @@ public class Client {
 
     /**
      * Constructor for the Client class
-     * @param off
+     * @param off the offset of the chat window
      */
     public Client(int off) {
         this.name = chooseName();
@@ -93,13 +92,17 @@ public class Client {
         receiveMessageThread.start();
     }
 
+    /**
+     * Method to send a message
+     * @param sTo the receivers of the message
+     * @param text the text of the message
+     * @param icon the image of the message
+     */
     public void newMessage(String[] sTo, String text, ImageIcon icon) {
         User me = findUserByUsername(onlineUsers, name);
         User[] sendTo = Arrays.stream(sTo)
                 .map(username -> findUserByUsername(onlineUsers, username))
                 .toArray(User[]::new);
-
-
 
         Message message = new Message(me, sendTo, text, icon);
         message.setTimeSent(LocalDateTime.now());
@@ -114,9 +117,9 @@ public class Client {
 
     /**
      * Method to find a user by their username
-     * @param users
-     * @param targetUsername
-     * @return
+     * @param users the array of users
+     * @param targetUsername the username of the user to find
+     * @return the user with the given username
      */
     private User findUserByUsername(User[] users, String targetUsername) {
         return Arrays.stream(users)
@@ -125,6 +128,10 @@ public class Client {
                 .orElse(new User("Null" + targetUsername, null));
     }
 
+    /**
+     * Method to set the online users
+     * @param uList the array of users
+     */
     private void setOnline(User[] uList) {
         if (!Arrays.equals(uList, onlineUsers)) {
             List<String> userNames = Arrays.stream(uList)
@@ -138,10 +145,17 @@ public class Client {
         }
     }
 
+    /**
+     * Getter to get the name of the client
+     * @return the name of the client
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Method to close the connection to the server
+     */
     public void shutDown() {
         try {
             if (socket != null && !socket.isClosed()) {
@@ -159,6 +173,10 @@ public class Client {
         }
     }
 
+    /**
+     * Method to add a new contact to the list of contacts
+     * @param newContacts the array of new contacts
+     */
     public void addContact(String[] newContacts) {
         try {
             Set<String> existingContacts = readExistingContacts();
@@ -170,6 +188,11 @@ public class Client {
         }
     }
 
+    /**
+     * Method to read the list of existing contacts
+     * @return the set of existing contacts
+     * @throws IOException if the file cannot be read
+     */
     public Set<String> readExistingContacts() throws IOException {
         Set<String> existingContacts = new HashSet<>();
 
@@ -180,6 +203,11 @@ public class Client {
         return existingContacts;
     }
 
+    /**
+     * Method to write the list of existing contacts to the text file
+     * @param contacts the set of existing contacts
+     * @throws IOException if the file cannot be written
+     */
     private void writeContactsToFile(Set<String> contacts) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("files/contacts.txt"))) {
             contacts.forEach(contact -> {

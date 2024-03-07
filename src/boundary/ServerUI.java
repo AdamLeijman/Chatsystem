@@ -21,6 +21,9 @@ public class ServerUI {
         createUI();
     }
 
+    /**
+     * Creates the UI with the existing information from the text file
+     */
     public void createUI() {
         SwingUtilities.invokeLater(() -> {
             frame = new JFrame("Server UI");
@@ -64,6 +67,9 @@ public class ServerUI {
 
     }
 
+    /**
+     * Adds the existing information from the text file to the JList
+     */
     private void addExistingInfo() {
         BufferedReader bf;
         ArrayList<String> tempList = new ArrayList<>();
@@ -85,6 +91,11 @@ public class ServerUI {
         } catch (IOException e){e.printStackTrace();}
     }
 
+    /**
+     * Checks if the line is a valid date and time
+     * @param line The line to be checked
+     * @return True if the line is a valid date and time, false otherwise
+     */
     private boolean isLineOk(String line) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
 
@@ -102,6 +113,12 @@ public class ServerUI {
         }
     }
 
+    /**
+     * Add new information to the text file
+     * @param sent The time the information was sent
+     * @param received The time the information was received
+     * @param event The type of event that occurred
+     */
     public void addInfo(LocalDateTime sent, LocalDateTime received, String event) {
         try {
             BufferedWriter out = new BufferedWriter(new FileWriter("files/Traffic.txt", true));
@@ -113,7 +130,9 @@ public class ServerUI {
         }
     }
 
-
+    /**
+     * Filter the list data to a certain date and time
+     */
     public void filter(){
         String inputDate1 = JOptionPane.showInputDialog("Enter the start date (yyyy-MM-dd):");
         String inputTime1 = JOptionPane.showInputDialog("Enter the start time (HH:mm):");
@@ -135,12 +154,18 @@ public class ServerUI {
         clearAndUpdateWindow();
     }
 
+    /**
+     * Reset the list data to show everything again and update the window
+     */
     private void resetFilter() {
         startDateTime = null;
         endDateTime =null;
         clearAndUpdateWindow();
     }
 
+    /**
+     * Clear the list data and update the window
+     */
     private void clearAndUpdateWindow() {
         info.setListData(new String[0]);  // Clear the list data by setting an empty array
         addExistingInfo();

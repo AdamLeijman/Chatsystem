@@ -100,6 +100,10 @@ public class Server extends Thread {
             return os;
         }
 
+        /**
+         * The Reader class is a Runnable class that reads messages from the clients.
+         * The class checks for messages from a client and sends them to the writer.
+         */
         private class Reader {
             private final Writer writer;
             boolean isRunning = true;
@@ -111,6 +115,10 @@ public class Server extends Thread {
                 reading();
             }
 
+            /**
+             * Method that checks for messages from a client and sends them to the writer.
+             * Also checks if a client has disconnected from the server.
+             */
             private synchronized void reading() {
                 try {
                     while (isRunning) {
@@ -118,8 +126,6 @@ public class Server extends Thread {
                         Object obj = is.readObject();
                         if (obj instanceof Message m) {
                             m.setTimeReceived(LocalDateTime.now());
-
-
                             writer.sendCurrMessage(m);
                         }
 
@@ -170,7 +176,7 @@ public class Server extends Thread {
 
             /**
              * Checks if there are any unsent messages and sends them
-             * @throws IOException
+             * @throws IOException If an I/O error occurs
              */
             private synchronized void checkUnsentMessages() throws IOException {
                 ArrayList<Message> arrayList = unsendMessages.get(user);
@@ -191,6 +197,10 @@ public class Server extends Thread {
                 }
             }
 
+            /**
+             * Updates the connectedUsers array
+             * @throws IOException If an I/O error occurs
+             */
             public void updateConnections() throws IOException {
                 Set<User> clientSet = newClients.getClients().keySet();
                 User[] uList = new User[clientSet.size()];
@@ -213,15 +223,13 @@ public class Server extends Thread {
 
             /**
              * Sends the message to the receivers
-             * @param m
-             * @throws IOException
+             * @param m The message to be sent
+             * @throws IOException If an I/O error occurs
              */
             public void sendCurrMessage(Message m) throws IOException {
                 for (User user : m.getReceivers()) {
                     if (user.getUsername().startsWith("Null")) {
                         unsendMessages.put(user, m);
-
-
                     } else {
                         for (User u : newClients.getClients().keySet()) {
                             if (Objects.equals(u.getUsername(), user.getUsername())) {
@@ -242,9 +250,9 @@ public class Server extends Thread {
 
         /**
          * Checks if two arrays are equal
-         * @param array1
-         * @param array2
-         * @return
+         * @param array1 First array to be compared
+         * @param array2 Second array to be compared
+         * @return True if the arrays are equal, false otherwise
          */
         public boolean areArraysEqual(User[] array1, User[] array2) {
             if (array1.length != array2.length) {
