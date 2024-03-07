@@ -65,7 +65,7 @@ public class Client {
     }
 
     /**
-     * Method to receive messages
+     * Method to receive a message from the server, either a message or an array of users
      */
     public void receiveMessage() {
         Thread receiveMessageThread = new Thread(() -> {
