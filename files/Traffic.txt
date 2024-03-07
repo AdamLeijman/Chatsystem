@@ -44,3 +44,13 @@
 2024-03-07T15:32:39.066476 null, Logout from Albert
 2024-03-07T15:32:40.297563 null, Logout from John
 2024-03-07T15:32:43.859382 null, Logout from Adam
+2024-03-07T15:43:45.132614 null, Login from martin
+2024-03-07T15:43:57.514879 null, Login from John
+2024-03-07T15:44:04.145853 null, Login from Ewa
+2024-03-07T15:44:38.562510 null, Login from Sylvia Plath
+2024-03-07T15:44:49.182930 2024-03-07T15:44:49.209828, Message from martin to Sylvia Plath
+2024-03-07T15:45:06.034601 2024-03-07T15:45:06.041237, Message from Sylvia Plath to martin
+2024-03-07T15:45:18.857304 null, Logout from martin
+2024-03-07T15:45:21.029072 null, Logout from Sylvia Plath
+2024-03-07T15:45:23.602687 null, Logout from John
+2024-03-07T15:45:24.772099 null, Logout from Ewa
